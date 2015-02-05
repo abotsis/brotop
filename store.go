@@ -70,6 +70,7 @@ func (self *Store) Get(key string) ([]byte, error) {
 	return value, err
 }
 
+// Works for both save and update
 func (self *Store) Set(key, value string) error {
 
 	err := self.db.Update(func(tx *bolt.Tx) error {
@@ -80,10 +81,8 @@ func (self *Store) Set(key, value string) error {
 	return err
 }
 
-func (self *Store) Update(key, value string) {
-
-}
-
-func (self *Store) Delete(key string) {
-
+func (self *Store) Delete(key string) error {
+	return self.db.View(func(tx *bolt.Tx) error {
+		return self.Bucket.Delete([]byte(key))
+	})
 }
