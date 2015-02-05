@@ -2,25 +2,24 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/ActiveState/tail"
 )
 
 type Wrapper struct {
-	Name      string
-	Fields    []string
-	Path      string
-	CreatedAt time.Time
-	Types     []string
-	Follow    bool
-	Seek      tail.SeekInfo
-	Config    tail.Config
+	Name   string
+	Header *BroHeader
+	Path   string
+	Follow bool
+	Seek   tail.SeekInfo
+	Config tail.Config
 }
 
-func NewWrapper() *Wrapper {
+func NewWrapper(path string) *Wrapper {
 
-	self := &Wrapper{}
+	self := &Wrapper{
+		Path: path,
+	}
 
 	return self
 }
@@ -43,8 +42,16 @@ func (self *Wrapper) Tail() {
 	}
 }
 
-func (self *Wrapper) Init() {
+func (self *Wrapper) Init() bool {
+	header, err := GetBroHeader(self.Path)
 
+	if err != nil {
+		return false
+	}
+
+	self.Header = header
+
+	return true
 }
 
 func (self *Wrapper) Update() {
