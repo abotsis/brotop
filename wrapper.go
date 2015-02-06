@@ -86,15 +86,21 @@ func (self *Wrapper) Capture() {
 	for line := range self.Tail.Lines {
 
 		offset, err := self.Tail.Tell()
+		data := line.Text
 
-		message := Message{
-			Self:   self,
-			Offset: offset,
-			Error:  err,
-			Data:   line.Text,
+		if !strings.HasPrefix(data, "#") {
+			message := Message{
+				Self:   self,
+				Offset: offset,
+				Error:  err,
+				Data:   data,
+			}
+
+			if len(data) > 0 {
+				OutputChan <- message
+			}
 		}
 
-		OutputChan <- message
 	}
 
 	err = self.Tail.Wait()
