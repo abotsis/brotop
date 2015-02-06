@@ -4,12 +4,9 @@ import (
 	"bufio"
 	"encoding/hex"
 	"errors"
-	"fmt"
-	"io"
 	"log"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/Unknwon/com"
 )
@@ -20,13 +17,17 @@ type BroHeader struct {
 	SetSeparator string
 	EmptyField   string
 	UnsetField   string
-	CratedAt     time.Time
+	Timestamp    string
 	Fields       map[string]string
 }
 
 var (
 	BRO_LOCATIONS = []string{"/opt/bro/logs/current", "/usr/local/bro/logs/current"}
 )
+
+func getValue(line string, sep string) []string {
+	return strings.Split(strings.Trim(line, "\n"), "\t")[1:]
+}
 
 func GetBroHeader(path string) (*BroHeader, error) {
 	header := &BroHeader{}
@@ -42,27 +43,35 @@ func GetBroHeader(path string) (*BroHeader, error) {
 	scanner := bufio.NewReader(data)
 	line, err := scanner.ReadString('\n')
 
-	for err == nil {
+	var fields []string
+	var types []string
 
+	for err == nil {
 		if strings.HasPrefix(line, "#") {
 			if strings.HasPrefix(line, "#separator") {
-				sep := strings.Split(line, " ")[1]
-				fmt.Println("SEP::", sep)
+				sep := strings.Trim(strings.Split(line, " ")[1], "\n")
 				sepchar, err := hex.DecodeString(sep[2:])
+
 				if err != nil {
 					log.Panic(err)
 				}
+
 				header.Separator = string(sepchar)
+
 			} else if strings.HasPrefix(line, "#fields") {
-				fields := strings.Split(line, "\t")[1:]
-				for idx, typ := range fields {
-					fmt.Println(idx, typ)
-				}
+				fields = getValue(line, header.Separator)
 			} else if strings.HasPrefix(line, "#types") {
-				types := strings.Split(line, "\t")[1:]
-				for idx, typ := range types {
-					fmt.Println(idx, typ)
-				}
+				types = getValue(line, header.Separator)
+			} else if strings.HasPrefix(line, "#set_separator") {
+				header.SetSeparator = getValue(line, header.Separator)[0]
+			} else if strings.HasPrefix(line, "#empty_field") {
+				header.EmptyField = getValue(line, header.Separator)[0]
+			} else if strings.HasPrefix(line, "#unset_field") {
+				header.UnsetField = getValue(line, header.Separator)[0]
+			} else if strings.HasPrefix(line, "#path") {
+				header.Name = getValue(line, header.Separator)[0]
+			} else if strings.HasPrefix(line, "#open") {
+				header.Timestamp = getValue(line, header.Separator)[0]
 			}
 
 			line, err = scanner.ReadString('\n')
@@ -70,12 +79,19 @@ func GetBroHeader(path string) (*BroHeader, error) {
 		} else {
 			break
 		}
-
 	}
 
-	if err != io.EOF {
-		return header, err
+	if len(fields) <= 0 && len(types) <= 0 {
+		return header, errors.New("Not a bro log file.")
 	}
+
+	m := make(map[string]string)
+
+	for i, f := range fields {
+		m[f] = types[i]
+	}
+
+	header.Fields = m
 
 	return header, nil
 }
@@ -90,8 +106,8 @@ func CheckDefaultLocations() (bool, string) {
 	return false, ""
 }
 
-func FindBroLogs() ([]interface{}, error) {
-	var empty []interface{}
+func FindBroLogs() ([]*Wrapper, error) {
+	var empty []*Wrapper
 	var paths []string
 	var err error
 
@@ -111,7 +127,7 @@ func FindBroLogs() ([]interface{}, error) {
 		return empty, err
 	}
 
-	var valid []interface{}
+	var valid []*Wrapper
 
 	for _, file := range paths {
 

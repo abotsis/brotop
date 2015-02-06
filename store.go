@@ -8,21 +8,20 @@ import (
 )
 
 type Store struct {
-	BucketName string
-	Bucket     *bolt.Bucket
-	Path       string
-	Perms      os.FileMode
-	db         *bolt.DB
-	Timeout    time.Duration
+	Bucket  string
+	Path    string
+	Perms   os.FileMode
+	db      *bolt.DB
+	Timeout time.Duration
 }
 
 func NewStore(path string, perms os.FileMode, time time.Duration) (*Store, error) {
 
 	self := &Store{
-		BucketName: "BroTop",
-		Path:       path,
-		Perms:      perms,
-		Timeout:    time,
+		Bucket:  "BroTop",
+		Path:    path,
+		Perms:   perms,
+		Timeout: time,
 	}
 
 	err := self.Open()
@@ -42,7 +41,7 @@ func (self *Store) Open() error {
 	self.db = db
 
 	self.db.Update(func(tx *bolt.Tx) error {
-		self.Bucket, err = tx.CreateBucketIfNotExists([]byte(self.BucketName))
+		_, err := tx.CreateBucketIfNotExists([]byte(self.Bucket))
 
 		if err != nil {
 			return err
@@ -63,7 +62,8 @@ func (self *Store) Get(key string) ([]byte, error) {
 	var value []byte
 
 	err := self.db.View(func(tx *bolt.Tx) error {
-		value = self.Bucket.Get([]byte(key))
+		b := tx.Bucket([]byte(self.Bucket))
+		value = b.Get([]byte(key))
 		return nil
 	})
 
@@ -74,7 +74,8 @@ func (self *Store) Get(key string) ([]byte, error) {
 func (self *Store) Set(key, value string) error {
 
 	err := self.db.Update(func(tx *bolt.Tx) error {
-		err := self.Bucket.Put([]byte(key), []byte(value))
+		b := tx.Bucket([]byte(self.Bucket))
+		err := b.Put([]byte(key), []byte(value))
 		return err
 	})
 
@@ -83,6 +84,7 @@ func (self *Store) Set(key, value string) error {
 
 func (self *Store) Delete(key string) error {
 	return self.db.View(func(tx *bolt.Tx) error {
-		return self.Bucket.Delete([]byte(key))
+		b := tx.Bucket([]byte(self.Bucket))
+		return b.Delete([]byte(key))
 	})
 }
