@@ -22,7 +22,10 @@ type BroHeader struct {
 }
 
 var (
-	BRO_LOCATIONS = []string{"/opt/bro/logs/current", "/usr/local/bro/logs/current"}
+	BRO_LOCATIONS = []string{
+		"/opt/bro/logs/current",
+		"/usr/local/bro/logs/current",
+	}
 )
 
 func getValue(line string, sep string) []string {
