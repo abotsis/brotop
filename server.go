@@ -57,9 +57,10 @@ func StartServer() {
 	}
 
 	log.Infof("Server listening - http://%s%s", "127.0.0.1", port)
+
 	err := http.ListenAndServe(port, nil)
 
 	if err != nil {
-		panic("ListenAndServe: " + err.Error())
+		log.Error(err.Error())
 	}
 }

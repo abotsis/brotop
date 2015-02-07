@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -54,24 +55,28 @@ func (self *Message) Json() (string, error) {
 
 	section := make([]map[string]string, len(data))
 
-	for i, value := range self.Self.Header.Fields {
-		dmap := make(map[string]string)
+	if len(data) == len(self.Self.Header.Fields) {
+		for i, value := range self.Self.Header.Fields {
+			dmap := make(map[string]string)
 
-		key := self.Self.Header.FieldMap[value]
+			key := self.Self.Header.FieldMap[value]
 
-		dmap["value"] = data[i]
-		dmap["type"] = key
-		dmap["field"] = value
+			dmap["value"] = data[i]
+			dmap["type"] = key
+			dmap["field"] = value
 
-		section[i] = dmap
+			section[i] = dmap
+		}
+
+		jsonLine.Fields = self.Self.Header.Fields
+		jsonLine.Data = section
+
+		j, err := json.Marshal(jsonLine)
+
+		return string(j), err
 	}
 
-	jsonLine.Fields = self.Self.Header.Fields
-	jsonLine.Data = section
-
-	j, err := json.Marshal(jsonLine)
-
-	return string(j), err
+	return "", errors.New("Error: mismatch len for header and event data.")
 }
 
 func NewWrapper(path string) *Wrapper {

@@ -32,7 +32,7 @@ var Collection;
 
 function Collection(json, options) {
   this.name = json.name;
-  this.max = options.max || 1;
+  this.max = options.max || 100;
   this.count = 0;
   this.items = [];
 
@@ -41,7 +41,7 @@ function Collection(json, options) {
   this.id = "#" + this.name;
 
   if ($(this.id).length <= 0) {
-    $("body").append(this.template(json));
+    $("#wrapper .content").append(this.template(json));
   }
 }
 
@@ -96,9 +96,7 @@ BroTop = {
           BroTop.collection[json.type].Add(json);
         } else {
 
-          var collection = new Collection(json, {
-            max: 1
-          });
+          var collection = new Collection(json, {});
 
           BroTop.collection[json.type] = collection;
         }

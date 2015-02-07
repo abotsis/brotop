@@ -29,9 +29,15 @@ deps: bindata
 	@$(ECHO) "$(OK_COLOR)==> Installing dependencies$(NO_COLOR)"
 	@godep get
 
+updatedeps:
+	@$(ECHO) "$(OK_COLOR)==> Updating all dependencies$(NO_COLOR)"
+	@go get -d -v -u ./...
+	@echo $(DEPS) | xargs -n1 go get -d -u
+	@godep update ...
+
 bindata:
 	@$(ECHO) "$(OK_COLOR)==> Embedding Assets$(NO_COLOR)"
-	@go-bindata web/...
+	@go-bindata -debug web/...
 
 test: deps
 	@$(ECHO) "$(OK_COLOR)==> Testing $(NAME)...$(NO_COLOR)"

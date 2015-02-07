@@ -4,25 +4,58 @@
     <meta charset="UTF-8">
     <title>BroTop</title>
 
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+
     <script type="text/javascript" src="gotalk.js"></script>
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="handlebars.js"></script>
     <script type="text/javascript" src="brotop.js"></script>
+
+    <link rel="stylesheet" href="grid.css">
+    <link rel="stylesheet" href="brotop.css">
+
+    <link rel="shortcut icon" href="favicon.png" />
   </head>
   <body>
 
+    <div id="sidebar"></div>
+
+    <div id="wrapper">
+      <div class="content"></div>
+    </div>
+
     <script id="collection" type="text/x-handlebars-template">
+
       <div id="{{type}}">
-      <table id="collection-table-{{type}}">
-      <thead>
-      <tr>
-      {{#each fields}}
-      <th data-name="{{this}}">{{this}}</th>
-      {{/each}}
-      </tr>
-      </thead>
-      <tbody></tbody>
-      </table>
+
+      <div class="content-header">
+        <table>
+        <thead>
+        <tr>
+        {{#each fields}}
+        <th data-name="{{this}}">{{this}}</th>
+        {{/each}}
+        </tr>
+        </thead>
+        <tbody></tbody>
+        </table>
+        </div>
+      </div>
+
+      <div class="content-scroll">
+        <table id="collection-table-{{type}}">
+        <thead style="opacity:0">
+        <tr>
+        {{#each fields}}
+        <th data-name="{{this}}">{{this}}</th>
+        {{/each}}
+        </tr>
+        </thead>
+        <tbody></tbody>
+        </table>
+      </div>
+
       </div>
     </script>
 

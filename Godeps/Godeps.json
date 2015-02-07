@@ -7,8 +7,13 @@
 			"Rev": "068b72961a6bc5b4a82cf4fc14ccc724c0cfa73a"
 		},
 		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.6.4-12-g467d9d5",
+			"Rev": "467d9d55c2d2c17248441a8fc661561161f40d5e"
+		},
+		{
 			"ImportPath": "github.com/Unknwon/com",
-			"Rev": "d9bcf409c8a368d06c9b347705c381e7c12d54df"
+			"Rev": "1df3edaa256d8e165253fd239950dde81d685246"
 		},
 		{
 			"ImportPath": "github.com/alecthomas/colour",
@@ -24,6 +29,10 @@
 			"Rev": "b8dbe1101d74c30e817227a99716591e3e6e6bc4"
 		},
 		{
+			"ImportPath": "github.com/elazarl/go-bindata-assetfs",
+			"Rev": "fe5a90c9bd2990734f4928be5d3aeebb00f61f70"
+		},
+		{
 			"ImportPath": "github.com/howeyc/fsnotify",
 			"Comment": "v0.9.0-14-g4894fe7",
 			"Rev": "4894fe7efedeeef21891033e1cce3b23b9af7ad2"
@@ -33,8 +42,12 @@
 			"Rev": "7fcc13b9d816a4f210371c58ed8c8d468787eb6c"
 		},
 		{
+			"ImportPath": "github.com/toqueteos/webbrowser",
+			"Rev": "4a77f4aa7da542c319bced7a5065b5d2b4f7041b"
+		},
+		{
 			"ImportPath": "golang.org/x/net/websocket",
-			"Rev": "3053e46bf4d836639f474dd738a58070463890e9"
+			"Rev": "c84eff7014eba178f68bd4c05b86780efe0fbf35"
 		},
 		{
 			"ImportPath": "gopkg.in/alecthomas/kingpin.v1",
