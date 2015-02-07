@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"sync"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/rsms/gotalk"
 )
@@ -55,6 +56,7 @@ func StartServer() {
 		port = fmt.Sprintf(":%s", ServerPort)
 	}
 
+	log.Infof("Server listening - http://%s%s", "127.0.0.1", port)
 	err := http.ListenAndServe(port, nil)
 
 	if err != nil {
