@@ -37,7 +37,7 @@ updatedeps:
 
 bindata:
 	@$(ECHO) "$(OK_COLOR)==> Embedding Assets$(NO_COLOR)"
-	@go-bindata -debug web/...
+	@go-bindata web/...
 
 test: deps
 	@$(ECHO) "$(OK_COLOR)==> Testing $(NAME)...$(NO_COLOR)"
