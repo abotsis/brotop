@@ -37,6 +37,13 @@ test: deps
 	@$(ECHO) "$(OK_COLOR)==> Testing $(NAME)...$(NO_COLOR)"
 	go test ./...
 
+goxBuild:
+	gox -build-toolchain
+
+gox: 
+	@$(ECHO) "$(OK_COLOR)==> GOX BroTop...$(NO_COLOR)"
+	gox output="pkg/{{.OS}}-{{.Arch}}/brotop"
+
 clean:
 	rm -rf bin/
 	rm -rf pkg/

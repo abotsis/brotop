@@ -1,5 +1,7 @@
 # brotop - Top for bro logs.
 
+[![Build Status](https://drone.io/github.com/mephux/brotop/status.png)](https://drone.io/github.com/mephux/brotop/latest)
+
 Brotop lets you stream you bro logs to the browser for easy 
 debugging and a real-time glimpse into whats being processed.
 
@@ -21,6 +23,8 @@ debugging and a real-time glimpse into whats being processed.
 
   Make sure you have go installed.
 
+  - `go get github.com/tools/godep`
+  - `go get github.com/jteeuwen/go-bindata/...`
   - `make`
 
 # Package as dep or rpm
