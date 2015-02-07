@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/rsms/gotalk"
 )
 
@@ -38,7 +39,15 @@ func StartServer() {
 
 	http.Handle("/gotalk", gotalk.WebSocketHandler(nil, onAccept))
 
-	http.Handle("/", http.FileServer(http.Dir("./web/")))
+	http.Handle("/",
+		http.FileServer(
+			&assetfs.AssetFS{
+				Asset:    Asset,
+				AssetDir: AssetDir,
+				Prefix:   "web",
+			},
+		),
+	)
 
 	var port string = ":8080"
 

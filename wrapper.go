@@ -31,10 +31,11 @@ type Message struct {
 }
 
 type JsonLine struct {
-	Data      map[string]map[string]string `json:"data"`
-	Type      string                       `json:"type"`
-	Path      string                       `json:"path"`
-	Timestamp time.Time                    `json:"timestamp"`
+	Data      []map[string]string `json:"data"`
+	Fields    []string            `json:"fields"`
+	Type      string              `json:"type"`
+	Path      string              `json:"path"`
+	Timestamp time.Time           `json:"timestamp"`
 }
 
 func (self *Message) Json() (string, error) {
@@ -51,7 +52,7 @@ func (self *Message) Json() (string, error) {
 	sep := self.Self.Header.Separator
 	data := strings.Split(self.Data, sep)
 
-	section := make(map[string]map[string]string)
+	section := make([]map[string]string, len(data))
 
 	for i, value := range self.Self.Header.Fields {
 		dmap := make(map[string]string)
@@ -60,10 +61,12 @@ func (self *Message) Json() (string, error) {
 
 		dmap["value"] = data[i]
 		dmap["type"] = key
+		dmap["field"] = value
 
-		section[value] = dmap
+		section[i] = dmap
 	}
 
+	jsonLine.Fields = self.Self.Header.Fields
 	jsonLine.Data = section
 
 	j, err := json.Marshal(jsonLine)

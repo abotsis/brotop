@@ -30,8 +30,8 @@ Event.prototype.Remove = function() {
 
 var Collection;
 
-function Collection(name, options) {
-  this.name = name;
+function Collection(json, options) {
+  this.name = json.name;
   this.max = options.max || 1;
   this.count = 0;
   this.items = [];
@@ -41,18 +41,35 @@ function Collection(name, options) {
   this.id = "#" + this.name;
 
   if ($(this.id).length <= 0) {
-    $("body").append(this.template({
-      type: name
-    }));
+    $("body").append(this.template(json));
+  }
+}
+
+Collection.prototype.Show = function() {
+  $(this.id).show();
+}
+
+Collection.prototype.Hide = function() {
+  $(this.id).hide();
+}
+
+
+Collection.prototype.Cleanup = function() {
+  var self = this;
+
+  while (self.count >= self.max) {
+    var evt = self.items.pop()
+    if (evt) {
+      evt.Remove();
+      this.count--;
+    }
   }
 }
 
 Collection.prototype.Add = function(json) {
+  var self = this;
 
-  if (this.count >= this.max) {
-    var rm = this.items.pop();
-    rm.Remove();
-  }
+  self.Cleanup();
 
   var event = new Event(json);
   this.items.push(event);
@@ -76,12 +93,10 @@ BroTop = {
       if (json.hasOwnProperty("type")) {
 
         if (BroTop.collection.hasOwnProperty(json.type)) {
-          console.log("GOT IT", json.type)
           BroTop.collection[json.type].Add(json);
         } else {
 
-          console.log("Making New Collection", json.type)
-          var collection = new Collection(json.type, {
+          var collection = new Collection(json, {
             max: 1
           });
 
@@ -98,6 +113,14 @@ BroTop = {
       if (err) return console.error(err);
       // s is a gotalk.Sock
     });
+  },
+
+  ChangeMax: function(max) {
+    for (collection in BroTop.collection) {
+      var item = BroTop.collection[collection];
+      item.max = max;
+      item.Cleanup();
+    }
   }
 
 }

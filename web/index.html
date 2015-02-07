@@ -16,7 +16,9 @@
       <table id="collection-table-{{type}}">
       <thead>
       <tr>
-      <th></th>
+      {{#each fields}}
+      <th data-name="{{this}}">{{this}}</th>
+      {{/each}}
       </tr>
       </thead>
       <tbody></tbody>
@@ -27,7 +29,7 @@
     <script id="event" type="text/x-handlebars-template">
       <tr id="{{id}}" class='event' data-type="{{type}}">
         {{#each data}}
-          <td data-type="{{this.type}}">{{this.value}}</td>
+          <td data-field="{{this.field}}" cdata-type="{{this.type}}">{{this.value}}</td>
         {{/each}}
       </tr>
     </script>

@@ -25,9 +25,13 @@ all: deps
 	@$(ECHO) "$(OK_COLOR)==> Done$(NO_COLOR)"
 
 
-deps:
+deps: bindata
 	@$(ECHO) "$(OK_COLOR)==> Installing dependencies$(NO_COLOR)"
 	@godep get
+
+bindata:
+	@$(ECHO) "$(OK_COLOR)==> Embedding Assets$(NO_COLOR)"
+	@go-bindata web/...
 
 test: deps
 	@$(ECHO) "$(OK_COLOR)==> Testing $(NAME)...$(NO_COLOR)"
