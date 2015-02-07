@@ -4,9 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/ActiveState/tail"
+)
+
+var (
+	msgmu sync.RWMutex
 )
 
 type Wrapper struct {
@@ -34,6 +39,9 @@ type JsonLine struct {
 
 func (self *Message) Json() (string, error) {
 
+	msgmu.Lock()
+	defer msgmu.Unlock()
+
 	jsonLine := JsonLine{
 		Type:      self.Self.Name,
 		Path:      self.Self.Path,
@@ -45,17 +53,15 @@ func (self *Message) Json() (string, error) {
 
 	section := make(map[string]map[string]string)
 
-	var index int = 0
-
-	for key, value := range self.Self.Header.Fields {
+	for i, value := range self.Self.Header.Fields {
 		dmap := make(map[string]string)
 
-		dmap["value"] = data[index]
-		dmap["type"] = value
+		key := self.Self.Header.FieldMap[value]
 
-		section[key] = dmap
+		dmap["value"] = data[i]
+		dmap["type"] = key
 
-		index += 1
+		section[value] = dmap
 	}
 
 	jsonLine.Data = section

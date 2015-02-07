@@ -18,7 +18,8 @@ type BroHeader struct {
 	EmptyField   string
 	UnsetField   string
 	Timestamp    string
-	Fields       map[string]string
+	Fields       []string
+	FieldMap     map[string]string
 }
 
 var (
@@ -94,7 +95,8 @@ func GetBroHeader(path string) (*BroHeader, error) {
 		m[f] = types[i]
 	}
 
-	header.Fields = m
+	header.Fields = fields
+	header.FieldMap = m
 
 	return header, nil
 }

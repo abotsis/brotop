@@ -21,6 +21,7 @@ const (
 var (
 	Debug          = kingpin.Flag("debug", "Enable debug mode.").Bool()
 	DefaultLogPath = kingpin.Flag("path", "Bro log path.").ExistingDir()
+	ServerPort     = kingpin.Flag("port", "Web server port.").String()
 
 	OutputChan = make(chan Message)
 	DoneChan   = make(chan bool)
@@ -53,9 +54,12 @@ func main() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt)
 
+	go StartServer()
+
 	for _, path := range paths {
 		path.Config.Follow = true
 		path.Config.ReOpen = true
+		path.Config.Poll = true
 
 		var offset int64 = 0
 
@@ -91,6 +95,7 @@ func main() {
 				panic(err)
 			}
 
+			Broadcast("event", json)
 			fmt.Println(json)
 
 			store.Set(msg.Self.Path, fmt.Sprintf("%d", msg.Offset))
