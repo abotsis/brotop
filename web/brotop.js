@@ -82,7 +82,7 @@ BroTop = {
 
           console.log("Making New Collection", json.type)
           var collection = new Collection(json.type, {
-            max: 100
+            max: 1
           });
 
           BroTop.collection[json.type] = collection;
