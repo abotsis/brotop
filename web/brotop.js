@@ -32,7 +32,7 @@ var Collection;
 
 function Collection(json, options) {
   this.name = json.name;
-  this.max = options.max || 100;
+  this.max = options.max || BroTop.max;
   this.count = 0;
   this.items = [];
 
@@ -83,7 +83,7 @@ Collection.prototype.Add = function(json) {
 var BroTop;
 
 BroTop = {
-
+  max: 100,
   collection: {},
   templates: {},
 
@@ -116,6 +116,7 @@ BroTop = {
   },
 
   ChangeMax: function(max) {
+    this.max = max;
     for (collection in BroTop.collection) {
       var item = BroTop.collection[collection];
       item.max = max;
