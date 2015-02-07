@@ -1,0 +1,10 @@
+table {
+  table-layout: fixed;
+  width: 100px;
+}
+
+td {
+  white-space: nowrap;
+  overflow: hidden;         /* <- this does seem to be required */
+  text-overflow: ellipsis;
+}

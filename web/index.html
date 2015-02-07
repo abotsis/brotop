@@ -3,21 +3,35 @@
   <head>
     <meta charset="UTF-8">
     <title>BroTop</title>
+
+    <script type="text/javascript" src="gotalk.js"></script>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="handlebars.js"></script>
+    <script type="text/javascript" src="brotop.js"></script>
   </head>
   <body>
-    <script type="text/javascript" src="gotalk.js"></script>
-    <script type="text/javascript" src="brotop.js"></script>
-    <script>
-      gotalk.handleNotification('event', function (event) {
-        var json = JSON.parse(event)
-        console.log(json)
-      });
 
-      gotalk.connect('ws://'+document.location.host+'/gotalk', function (err, s) {
-        if (err) return console.error(err);
-        // s is a gotalk.Sock
-      });
+    <script id="collection" type="text/x-handlebars-template">
+      <div id="{{type}}">
+      <table id="collection-table-{{type}}">
+      <thead>
+      <tr>
+      <th></th>
+      </tr>
+      </thead>
+      <tbody></tbody>
+      </table>
+      </div>
     </script>
+
+    <script id="event" type="text/x-handlebars-template">
+      <tr id="{{id}}" class='event' data-type="{{type}}">
+        {{#each data}}
+          <td data-type="{{this.type}}">{{this.value}}</td>
+        {{/each}}
+      </tr>
+    </script>
+
 
   </body>
 </html>
