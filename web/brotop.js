@@ -58,10 +58,12 @@ Collection.prototype.Cleanup = function() {
   var self = this;
 
   while (self.count >= self.max) {
-    var evt = self.items.pop()
+
+    this.count--;
+    var evt = self.items.shift()
+
     if (evt) {
       evt.Remove();
-      this.count--;
     }
   }
 }
