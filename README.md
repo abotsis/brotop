@@ -2,6 +2,8 @@
 
 [![Build Status](https://drone.io/github.com/mephux/brotop/status.png)](https://drone.io/github.com/mephux/brotop/latest)
 
+![BroTop](https://raw.githubusercontent.com/mephux/brotop/master/brotop.png)
+
 Brotop lets you stream you bro logs to the browser for easy 
 debugging and a real-time glimpse into whats being processed.
 
