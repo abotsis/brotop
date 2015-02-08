@@ -21,6 +21,18 @@ debugging and a real-time glimpse into whats being processed.
   Just run `brotop` and everything would work. 
   Then open your browser to the port you set. (default port is 8080)
 
+  ```
+usage: brotop [<flags>]
+
+Flags:
+  --help           Show help.
+  --debug          Enable debug mode.
+  --path=PATH      Bro log path.
+  -p, --port=PORT  Web server port.
+  -q, --quiet      Remove all output logging.
+  --version        Show application version.
+  ```
+
 # Building
 
   Make sure you have go installed.
