@@ -10,59 +10,99 @@
     <script type="text/javascript" src="gotalk.js"></script>
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="handlebars.js"></script>
+    <script type="text/javascript" src="d3.min.js"></script>
+    <script type="text/javascript" src="smoothie.js"></script>
     <script type="text/javascript" src="brotop.js"></script>
 
     <link rel="stylesheet" href="grid.css">
+    <link rel="stylesheet" href="font-awesome.css">
+    <link rel="stylesheet" href="hover-min.css">
     <link rel="stylesheet" href="brotop.css">
 
     <link rel="shortcut icon" href="favicon.png" />
   </head>
   <body>
 
-    <div id="sidebar"></div>
+    <div id="sidebar">
+      
+      <div class="logo">
+        <span class="bro">Bro</span>
+        <span class="top">Top</span>
+        <span class="version">v 0.1.0</span>
+      </div>
 
-    <div id="wrapper">
+      <ul class="sidebar-menu">
+
+        <li class="item selected" data-type="all">
+          <a href="#">Show All Logs</a>
+        </li>
+        
+      </ul>
+
+      <canvas id="main-chart" class="" width="250px" height="100"></canvas>
+    
+    </div>
+
+    <div id="wrapper" class='scrollbar'>
       <div class="content"></div>
     </div>
 
+    <script id="sidebar-item" type="text/x-handlebars-template">
+      <li class="item" data-type="{{type}}">
+      <a href="#">{{type}}</a>
+      </li>
+    </script>
+
     <script id="collection" type="text/x-handlebars-template">
 
-      <div id="{{type}}">
+      <div id="{{type}}" class='section'>
 
-      <div class="content-header">
-        <table>
-        <thead>
-        <tr>
-        {{#each fields}}
-        <th data-name="{{this}}">{{this}}</th>
-        {{/each}}
-        </tr>
-        </thead>
-        <tbody></tbody>
-        </table>
+ <div class="terminals grid-100">
+
+    <div class="terminal-item">
+
+      <div class="terminal">
+        <header>
+        <h4>{{type}} ({{path}})</h4>
+          <ul class="shell-dots">
+            <li class="close"></li>
+            <li class="hide"></li>
+            <li class="full-screen"></li>
+          </ul>
+        </header>
+        <div class="terminal-window">
+          <div class="terminal">
+            <div class="display scrollbar">
+
+      <table id="collection-table-{{type}}">
+      <thead>
+      <tr>
+      {{#each fields}}
+      <th data-name="{{this}}">{{this}}</th>
+      {{/each}}
+      </tr>
+      </thead>
+      <tbody></tbody>
+      </table>
+
+            </div>
+          </div>
         </div>
       </div>
+    </div>
 
-      <div class="content-scroll">
-        <table id="collection-table-{{type}}">
-        <thead style="opacity:0">
-        <tr>
-        {{#each fields}}
-        <th data-name="{{this}}">{{this}}</th>
-        {{/each}}
-        </tr>
-        </thead>
-        <tbody></tbody>
-        </table>
-      </div>
+
+  </div>
+
 
       </div>
+
     </script>
 
     <script id="event" type="text/x-handlebars-template">
       <tr id="{{id}}" class='event' data-type="{{type}}">
         {{#each data}}
-          <td data-field="{{this.field}}" cdata-type="{{this.type}}">{{this.value}}</td>
+        <td title="{{this.value}}" data-field="{{this.field}}" cdata-type="{{this.type}}">{{this.value}}</td>
         {{/each}}
       </tr>
     </script>

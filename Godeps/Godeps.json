@@ -42,10 +42,6 @@
 			"Rev": "7fcc13b9d816a4f210371c58ed8c8d468787eb6c"
 		},
 		{
-			"ImportPath": "github.com/toqueteos/webbrowser",
-			"Rev": "4a77f4aa7da542c319bced7a5065b5d2b4f7041b"
-		},
-		{
 			"ImportPath": "golang.org/x/net/websocket",
 			"Rev": "c84eff7014eba178f68bd4c05b86780efe0fbf35"
 		},
