@@ -73,8 +73,6 @@ Collection.prototype.Maximise = function() {
 
   self.Cleanup();
 
-  console.log(self.id)
-
   $(self.id).addClass("full-screen")
 
   $(self.id).find(".display").on("scroll", function(e) {
