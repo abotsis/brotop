@@ -1,4 +1,4 @@
-image: mephux/golang
+image: mephux/docker-golang
 git:
   path: github.com/criticalstack/brotop
   branch: master
