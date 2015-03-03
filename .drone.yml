@@ -3,9 +3,6 @@ git:
   path: github.com/criticalstack/brotop
   branch: master
 script:
-  - git config --global url.ssh://git@github.com/.insteadOf https://github.com/
-  - go get github.com/jteeuwen/go-bindata/...
-  - go get github.com/tools/godep
   - make test
 notify:
   email:
