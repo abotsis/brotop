@@ -1,6 +1,6 @@
 # brotop - Top for bro logs.
 
-[![Build Status](https://drone.io/github.com/mephux/brotop/status.png)](https://drone.io/github.com/mephux/brotop/latest)
+[![Build Status](http://104.236.125.70/api/badge/github.com/criticalstack/brotop/status.svg?branch=master)](http://104.236.125.70/github.com/criticalstack/brotop)
 
 <img height="300px" width="" src="https://raw.githubusercontent.com/mephux/brotop/master/brotop.png?token=AABXAe5HY1UJns_gRtUyUvLqkMRYtnRAks5U4Ou_wA%3D%3D">
 
