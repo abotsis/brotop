@@ -7,6 +7,9 @@
 bin/
 bindata.go
 
+pkg/
+release/
+
 log/
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
