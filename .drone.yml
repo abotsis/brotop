@@ -1,4 +1,4 @@
-image: tcnksm/gox
+image: go1.3
 git:
   path: github.com/criticalstack/brotop
   branch: master
@@ -23,7 +23,7 @@ notify:
     on_failure: true
 publish:
   github:
-    branch: master
+    branch: word
     script:
       - make release
     artifacts:
