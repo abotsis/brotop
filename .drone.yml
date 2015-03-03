@@ -1,4 +1,4 @@
-image: go1.3
+image: mephux/golang
 git:
   path: github.com/criticalstack/brotop
   branch: master
