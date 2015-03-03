@@ -13,11 +13,11 @@ script:
 notify:
   email:
     recipients:
-      - {{EMAIL}}
+      - $$EMAIL
   slack:
-    username: {{USERNAME}}
-    webhook_url: {{WEBHOOK}}
-    channel: {{CHANNEL}}
+    username: $$USERNAME
+    webhook_url: $$WEBHOOK
+    channel: $$CHANNEL
     on_started: false
     on_success: true
     on_failure: true
@@ -29,6 +29,6 @@ publish:
     artifacts:
       - release
     tag: v$(cat brotop.go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$\)")
-    token: {{github_token}}
+    token: $$github_token
     user: criticalstack
     repo: brotop
