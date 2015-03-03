@@ -2,9 +2,6 @@ image: mephux/docker-golang
 git:
   path: github.com/criticalstack/brotop
   branch: master
-env:
-  - GOROOT=/usr/local/go
-  - PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 script:
   - git config --global url.ssh://git@github.com/.insteadOf https://github.com/
   - go get github.com/jteeuwen/go-bindata/...
