@@ -41,7 +41,7 @@ bindata:
 
 test: deps
 	@$(ECHO) "$(OK_COLOR)==> Testing $(NAME)...$(NO_COLOR)"
-	go test ./...
+	godep go test ./...
 
 goxBuild:
 	gox -build-toolchain

@@ -9,8 +9,7 @@ script:
   - git config --global url.ssh://git@github.com/.insteadOf https://github.com/
   - go get github.com/tools/godep
   - go get github.com/jteeuwen/go-bindata/...
-  - make
-  - go test -short
+  - make test
 notify:
   email:
     recipients:
