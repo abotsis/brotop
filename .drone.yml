@@ -1,0 +1,24 @@
+image: go1.3
+git:
+  path: github.com/criticalstack/brotop
+  branch: master
+env:
+  - GOROOT=/usr/local/go
+  - PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+script:
+  - git config --global url.ssh://git@github.com/.insteadOf https://github.com/
+  - go get github.com/tools/godep
+  - go get github.com/jteeuwen/go-bindata/...
+  - make
+  - go test -short
+notify:
+  email:
+    recipients:
+      - *EMAIL 
+  slack:
+    username: *USERNAME
+    webhook_url: *WEBHOOK
+    channel: *CHANNEL
+    on_started: false
+    on_success: true
+    on_failure: true
