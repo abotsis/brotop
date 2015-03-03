@@ -4,6 +4,7 @@ import (
   "os"
   "os/signal"
   "syscall"
+  "time"
 )
 
 
@@ -15,8 +16,8 @@ type Server struct {
   // Handlers associated with this listener. Accepted sockets inherit the value.
   Handlers *Handlers
 
-  // Default value for accepted sockets' StreamReqLimit
-  StreamReqLimit int
+  // Limits. Accepted sockets are subject to the same limits.
+  Limits Limits
 
   // Function to be invoked just after a new socket connection has been accepted and
   // protocol handshake has sucessfully completed. At this point the socket is ready
@@ -24,24 +25,53 @@ type Server struct {
   // meaning no messages will be received on the socket until this function returns.
   AcceptHandler SockHandler
 
+  // Template value for accepted sockets. Defaults to 0 (no automatic heartbeats)
+  HeartbeatInterval time.Duration
+
+  // Template value for accepted sockets. Defaults to nil
+  OnHeartbeat func(load int, t time.Time)
+
   listener net.Listener
 }
 
 
-func NewServer(h *Handlers, l net.Listener) *Server {
-  return &Server{Handlers:h, listener:l}
+// Create a new server already listening on `l`
+func NewServer(h *Handlers, limits Limits, l net.Listener) *Server {
+  return &Server{Handlers:h, Limits:limits, listener:l}
+}
+
+
+type tcpKeepAliveListener struct {
+  *net.TCPListener
+}
+
+func (ln tcpKeepAliveListener) Accept() (c net.Conn, err error) {
+  tc, err := ln.AcceptTCP()
+  if err != nil {
+    return
+  }
+  tc.SetKeepAlive(true)
+  tc.SetKeepAlivePeriod(30 * time.Second)
+  return tc, nil
 }
 
 
 // Start a `how` server listening for connections at `addr`. You need to call Accept() on the
-// returned socket to start accepting connections.
+// returned socket to start accepting connections. `how` and `addr` are passed to `net.Listen()`
+// and thus any values accepted by net.Listen are valid.
+// The returned server has Handlers=DefaultHandlers and Limits=DefaultLimits set.
 func Listen(how, addr string) (*Server, error) {
   l, err := net.Listen(how, addr)
   if err != nil {
     return nil, err
   }
 
-  s := NewServer(DefaultHandlers, l)
+  if tcpl, ok := l.(*net.TCPListener); ok {
+    // Wrap TCP listener to enable TCP keep-alive
+    l = &tcpKeepAliveListener{tcpl}
+  }
+
+  s := NewServer(DefaultHandlers, DefaultLimits, l)
 
   if how == "unix" || how == "unixpacket" {
     // Unix sockets must be unlink()ed before being reused again.
@@ -74,10 +104,23 @@ func Serve(how, addr string, acceptHandler SockHandler) error {
 
 // Accept connections. Blocks until Close() is called or an error occurs.
 func (s *Server) Accept() error {
+  var tempDelay time.Duration // how long to sleep on accept failure
   for {
-    c, err := s.listener.Accept()
-    if err != nil {
-      return err
+    c, e := s.listener.Accept()
+    if e != nil {
+      if ne, ok := e.(net.Error); ok && ne.Temporary() {
+        if tempDelay == 0 {
+          tempDelay = 5 * time.Millisecond
+        } else {
+          tempDelay *= 2
+        }
+        if max := 1 * time.Second; tempDelay > max {
+          tempDelay = max
+        }
+        time.Sleep(tempDelay)
+        continue
+      }
+      return e
     }
     go s.accept(c)
   }
@@ -85,13 +128,14 @@ func (s *Server) Accept() error {
 
 func (s *Server) accept(c net.Conn) {
   s2 := NewSock(s.Handlers)
-  s2.StreamReqLimit = s.StreamReqLimit
   s2.Adopt(c)
   if err := s2.Handshake(); err == nil {
     if s.AcceptHandler != nil {
       s.AcceptHandler(s2)
     }
-    s2.Read()
+    s2.HeartbeatInterval = s.HeartbeatInterval
+    s2.OnHeartbeat = s.OnHeartbeat
+    s2.Read(s.Limits)
   }
 }
 

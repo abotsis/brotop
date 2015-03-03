@@ -16,10 +16,8 @@ func recoverAsFail(t *testing.T) {
 
 
 func checkReqHandler(t *testing.T, s *Sock, h *Handlers, name, input, expectedOutput string) {
-  if hv := h.FindRequestHandler(name); hv == nil {
+  if a := h.FindBufferRequestHandler(name); a == nil {
     t.Errorf("handler '%s' not found", name)
-  } else if a, ok := hv.(BufferReqHandler); ok == false {
-    t.Errorf("handler '%s' is not a BufferReqHandler", name)
   } else if outbuf, err := a(s, name, []byte(input)); err != nil {
     t.Errorf("handler '%s' returned an error: %s", name, err.Error())
   } else if bytes.Equal(outbuf, []byte(expectedOutput)) == false {
@@ -37,53 +35,53 @@ func TestRequestFuncHandlers(t *testing.T) {
   invocationCount := 0
 
   // All possible handler func permutations (with `int` value types)
-  h.HandleRequest("a", func(s *Sock, op string, p int) (int, error) {
+  h.Handle("a", func(s *Sock, op string, p int) (int, error) {
     if op != "a" {
       t.Errorf("expected op='a' but got '%s'", op)
     }
     invocationCount++
     return p+1, nil
   })
-  h.HandleRequest("b", func(s *Sock, p int) (int, error) {
+  h.Handle("b", func(s *Sock, p int) (int, error) {
     invocationCount++
     return p+1, nil
   })
-  h.HandleRequest("c", func(p int) (int, error) {
+  h.Handle("c", func(p int) (int, error) {
     invocationCount++
     return p+1, nil
   })
-  h.HandleRequest("d", func(s *Sock) (int, error) {
+  h.Handle("d", func(s *Sock) (int, error) {
     invocationCount++
     return 1, nil
   })
-  h.HandleRequest("e", func() (int, error) {
+  h.Handle("e", func() (int, error) {
     invocationCount++
     return 1, nil
   })
-  h.HandleRequest("f", func(s *Sock, op string, p int) error {
+  h.Handle("f", func(s *Sock, op string, p int) error {
     if op != "f" {
       t.Errorf("expected op='f' but got '%s'", op)
     }
     invocationCount++
     return nil
   })
-  h.HandleRequest("g", func(s *Sock, p int) error {
+  h.Handle("g", func(s *Sock, p int) error {
     invocationCount++
     return nil
   })
-  h.HandleRequest("h", func(p int) error {
+  h.Handle("h", func(p int) error {
     invocationCount++
     return nil
   })
-  h.HandleRequest("i", func(s *Sock) error {
+  h.Handle("i", func(s *Sock) error {
     invocationCount++
     return nil
   })
-  h.HandleRequest("j", func() error {
+  h.Handle("j", func() error {
     invocationCount++
     return nil
   })
-  h.HandleRequest("", func(s *Sock, op string, p int) error {
+  h.Handle("", func(s *Sock, op string, p int) error {
     if op != "fallback1" && op != "fallback2" {
       t.Errorf("expected op='fallback1'||'fallback2' but got '%s'", op)
     }

@@ -2,15 +2,16 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
-	"strings"
 )
 
+const bindatafile = "bindata.go"
+
 func main() {
-	if !isInPath("go-bindata") {
+	if _, err := exec.LookPath("go-bindata"); err != nil {
 		fmt.Println("Cannot find go-bindata executable in path")
 		fmt.Println("Maybe you need: go get github.com/elazarl/go-bindata-assetfs/...")
 		os.Exit(1)
@@ -22,9 +23,9 @@ func main() {
 	if err := cmd.Run(); err != nil {
 		os.Exit(1)
 	}
-	in, err := os.Open("bindata.go")
+	in, err := os.Open(bindatafile)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Cannot read 'bindata.go'", err)
+		fmt.Fprintln(os.Stderr, "Cannot read", bindatafile, err)
 		return
 	}
 	out, err := os.Create("bindata_assetfs.go")
@@ -32,14 +33,17 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Cannot write 'bindata_assetfs.go'", err)
 		return
 	}
-	defer in.Close()
-	defer out.Close()
-	scanner := bufio.NewScanner(in)
-	for scanner.Scan() {
-		line := scanner.Text()
-		fmt.Fprintln(out, line)
-		if strings.HasPrefix(line, "import (") {
+	r := bufio.NewReader(in)
+	done := false
+	for line, isPrefix, err := r.ReadLine(); err == nil; line, isPrefix, err = r.ReadLine() {
+		line = append(line, '\n')
+		if _, err := out.Write(line); err != nil {
+			fmt.Fprintln(os.Stderr, "Cannot write to 'bindata_assetfs.go'", err)
+			return
+		}
+		if !done && !isPrefix && bytes.HasPrefix(line, []byte("import (")) {
 			fmt.Fprintln(out, "\t\"github.com/elazarl/go-bindata-assetfs\"")
+			done = true
 		}
 	}
 	fmt.Fprintln(out, `
@@ -49,16 +53,10 @@ func assetFS() *assetfs.AssetFS {
 	}
 	panic("unreachable")
 }`)
-	if err := os.Remove("bindata.go"); err != nil {
-		fmt.Fprintln(os.Stderr, "Cannot remove bindata_assetfs.go", err)
+	// Close files BEFORE remove calls (don't use defer).
+	in.Close()
+	out.Close()
+	if err := os.Remove(bindatafile); err != nil {
+		fmt.Fprintln(os.Stderr, "Cannot remove", bindatafile, err)
 	}
-}
-
-func isInPath(filename string) bool {
-	for _, path := range filepath.SplitList(os.Getenv("PATH")) {
-		if _, err := os.Stat(filepath.Join(path, "go-bindata")); err == nil {
-			return true
-		}
-	}
-	return false
 }

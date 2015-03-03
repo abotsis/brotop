@@ -1,4 +1,4 @@
-image: go1.3
+image: savaki/golang-gox
 git:
   path: github.com/criticalstack/brotop
   branch: master
@@ -7,7 +7,6 @@ env:
   - PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 script:
   - git config --global url.ssh://git@github.com/.insteadOf https://github.com/
-  - go get github.com/tools/godep
   - go get github.com/jteeuwen/go-bindata/...
   - make test
 notify:

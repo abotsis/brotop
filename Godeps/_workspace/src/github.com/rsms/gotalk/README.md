@@ -16,7 +16,7 @@ Gotalk takes the natural approach of *bidirectional* and *concurrent* communicat
 
 **Simple** — Gotalk has a simple and opinionated API with very few components. You expose an operation via "handle" and send requests via "request".
 
-**Debuggable** — The Gotalk protocol's wire format is ASCII-based for easy on-the-wire inspection of data. For example, here's a protocol message representing an operation request: `r001005hello00000005world`. The Gotalk protocol can thus be operated over any reliable byte transport.
+**Debuggable** — The Gotalk protocol's wire format is ASCII-based for easy on-the-wire inspection of data. For example, here's a protocol message representing an operation request: `r0001005hello00000005world`. The Gotalk protocol can thus be operated over any reliable byte transport.
 
 **Practical** — Gotalk includes a JavaScript implementation for Web Sockets alongside the full-featured Go implementation, making it easy to build real-time web applications. The Gotalk source code also includes a number of easily-readable examples.
 
@@ -131,14 +131,14 @@ import (
   "github.com/rsms/gotalk"
 )
 func main() {
-  gotalk.HandleBufferRequest("echo", func(in []byte) ([]byte, error) {
+  gotalk.Handle("echo", func(in string) (string, error) {
     return in, nil
   })
-  http.Handle("/gotalk", gotalk.WebSocketHandler(nil, nil))
+  http.Handle("/gotalk/", gotalk.WebSocketHandler())
   http.Handle("/", http.FileServer(http.Dir(".")))
-  err := http.ListenAndServe(":1234", nil)
+  err := http.ListenAndServe("localhost:1234", nil)
   if err != nil {
-    panic("ListenAndServe: " + err.Error())
+    panic(err)
   }
 }
 ```
@@ -148,7 +148,7 @@ In our html document, we begin by registering any operations we can handle:
 ```html
 <!-- index.html -->
 <body>
-<script type="text/javascript" src="gotalk.js"></script>
+<script type="text/javascript" src="/gotalk/gotalk.js"></script>
 <script>
 gotalk.handle('greet', function (params, result) {
   result({ greeting: 'Hello ' + params.name });
@@ -156,20 +156,23 @@ gotalk.handle('greet', function (params, result) {
 </script>
 ```
 
-We can't "listen & accept" connections in a web browser, but we can "connect" so we do just that, connecting to "/gotalk" which is where we registered `gotalk.WebSocketHandler` in our server.
+Notice how we load a JavaScript from "/gotalk/gotalk.js" — a gotalk web socket server embeds a matching web browser JS library which it returns from `{path where gotalk web socket is mounted}/gotalk.js`. It uses Etag cache validation, so you shouldn't need to think about "cache busting" the URL.
+
+We can't "listen & accept" connections in a web browser, but we can "connect" so we do just that:
 
 ```html
 <!-- index.html -->
 <body>
-<script type="text/javascript" src="gotalk.js"></script>
+<script type="text/javascript" src="/gotalk/gotalk.js"></script>
 <script>
 gotalk.handle('greet', function (params, result) {
   result({ greeting: 'Hello ' + params.name });
 });
 
-gotalk.connect('ws://'+document.location.host+'/gotalk', function (err, s) {
-  if (err) return console.error(err);
-  // s is a gotalk.Sock
+var s = gotalk.connection().on('open', function () {
+  // do something useful
+}).on('close', function (err) {
+  if (err.isGotalkProtocolError) return console.error(err);
 });
 </script>
 ```
@@ -179,8 +182,7 @@ This is enough for enabling the *server* to do things in the *browser* ...
 But you probably want to have the *browser* send requests to the *server*, so let's send a "echo" request just as our connection opens:
 
 ```js
-gotalk.connect('ws://'+document.location.host+'/gotalk', function (err, s) {
-  if (err) return console.error(err);
+var s = gotalk.connection().on('open', function () {
   s.request("echo", "Hello world", function (err, result) {
     if (err) return console.error('echo failed:', err);
     console.log('echo result:', result);
@@ -191,9 +193,7 @@ gotalk.connect('ws://'+document.location.host+'/gotalk', function (err, s) {
 We could rewrite our code like this to allow some UI component to send a request:
 
 ```js
-var s = gotalk.connect('ws://'+document.location.host+'/gotalk', function (err, s) {
-  if (err) return console.error(err);
-});
+var s = gotalk.connection();
 
 button.addEventListener('click', function () {
   s.request("echo", "Hello world", function (err, result) {
@@ -205,17 +205,22 @@ button.addEventListener('click', function () {
 
 The request will fail with an error "socket is closed" if the user clicks our button while the connection isn't open.
 
+There are two ways to open a connection on a socket: `Sock.prototype.open` which simply opens a connection, and `Sock.prototype.openKeepAlive` which keeps the connection open, reconnecting as needed with exponential back-off and internet reachability knowledge. `gotalk.connection()` is a short-hand for creating a new Sock with `gotalk.defaultHandlers` and then calling `openKeepAlive` on it.
+
 
 ## Protocol and wire format
 
 The wire format is designed to be human-readable and flexible; it's byte-based and can be efficiently implemented in a number of environments ranging from HTTP and WebSocket in a web browser to raw TCP in Go or C. The protocol provides only a small set of operations on which more elaborate operations can be modeled by the user.
+
+> This document describes protocol version 1
 
 Here's a complete description of the protocol:
 
     conversation    = ProtocolVersion Message*
     message         = SingleRequest | StreamRequest
                     | SingleResult | StreamResult
-                    | ErrorResult
+                    | ErrorResult | RetryResult
+                    | Notification | ProtocolError
 
     ProtocolVersion = <hexdigit> <hexdigit>
 
@@ -225,12 +230,19 @@ Here's a complete description of the protocol:
     SingleResult    = "R" requestID payload
     StreamResult    = "S" requestID payload StreamResult*
     ErrorResult     = "E" requestID payload
+    RetryResult     = "e" requestID wait payload
     Notification    = "n" name payload
+    Heartbeat       = "h" load time
+    ProtocolError   = "f" code
 
-    requestID       = <byte> <byte> <byte>
+    requestID       = <byte> <byte> <byte> <byte>
 
     operation       = text3
     name            = text3
+    wait            = hexUInt8
+    code            = hexUInt8
+    time            = hexUInt8
+    load            = hexUInt4
 
     text3           = text3Size text3Value
     text3Size       = hexUInt3
@@ -241,65 +253,113 @@ Here's a complete description of the protocol:
     payloadData     = <byte>{payloadSize}
 
     hexUInt3        = <hexdigit> <hexdigit> <hexdigit>
+    hexUInt4        = <hexdigit> <hexdigit> <hexdigit> <hexdigit>
     hexUInt8        = <hexdigit> <hexdigit> <hexdigit> <hexdigit>
                       <hexdigit> <hexdigit> <hexdigit> <hexdigit>
+
+
+### Handshake
 
 A conversation begins with the protocol version:
 
 ```lua
-00  -- ProtocolVersion 0
+01  -- ProtocolVersion 1
 ```
 
-If the version of the protocol spoken by the other end is not supported by the reader, the connection is terminated and the conversation never starts. Otherwise, any messages are read and/or written.
+If the version of the protocol spoken by the other end is not supported by the reader, a ProtocolError message is sent with code 1 and the connection is terminated. Otherwise, any messages are read and/or written.
+
+
+### Single-payload requests and results
 
 This is a "single-payload" request ...
 
 ```py
-+----------------- SingleRequest
-|  +---------------- requestID   "001"
-|  |      +--------- operation   "echo"
-|  |      |       +- payloadSize 25
-|  |      |       |
-r001004echo00000019{"message":"Hello World"}
++------------------ SingleRequest
+|   +---------------- requestID   "0001"
+|   |      +--------- operation   "echo" (text3Size 4, text3Value "echo")
+|   |      |       +- payloadSize 25
+|   |      |       |
+r0001004echo00000019{"message":"Hello World"}
 ```
 
 ... and a corresponding "single-payload" result:
 
 ```py
-+----------------- SingleResult
-|  +---------------- requestID   "001"
-|  |       +-------- payloadSize 25
-|  |       |
-R00100000019{"message":"Hello World"}
++------------------ SingleResult
+|   +---------------- requestID   "0001"
+|   |       +-------- payloadSize 25
+|   |       |
+R000100000019{"message":"Hello World"}
 ```
 
-Each request is identified by exactly three bytes—the `requestID`—which is requestor-specific and has no purpose beyond identity, meaning the value is never interpreted.
+Each request is identified by exactly three bytes—the `requestID`—which is requestor-specific and has no purpose beyond identity, meaning the value is never interpreted. 4 bytes can express 4 294 967 296 different values, meaning we can send up to 4 294 967 295 requests while another request is still being served. Should be enough.
 
 These "single" requests & results are the most common protocol messages, and as their names indicates, their payloads follow immediately after the header. For large payloads this can become an issue when dealing with many concurrent requests over a single connection, for which there's a more complicated "streaming" request & result type which we will explore later on.
 
-If an error occurs while handing a request, an "error" is send as the reply instead of a regular result:
+
+### Faults
+
+There are two types of replies indicating a fault: `ErrorResult` for requestor faults and `RetryResult` for responder faults.
+
+If a request is faulty, like missing some required input data or sent over an unauthorized connection, an "error" is send as the reply instead of a regular result:
 
 ```py
-+----------------- ErrorResult
-|  +---------------- requestID   "001"
-|  |       +-------- payloadSize 38
-|  |       |
-E00100000026{"error":"Unknown operation \"echo\""}
++------------------ ErrorResult
+|   +---------------- requestID   "0001"
+|   |       +-------- payloadSize 38
+|   |       |
+E000100000026{"error":"Unknown operation \"echo\""}
 ```
 
-As with all messages, what the payload data represents is up to each application and not part of the Gotalk protocol although we use JSON in our examples here.
+A request that produces an error should not be retried as-is, similar to the 400-class of errors of the HTTP protocol.
 
-When there's no expectation on a response, Gotalk provides a "notification" message type:
+In the scenario a fault occurs on the responder side, like suffering a temporary internal error or is unable to complete the request because of resource starvation, a RetryResult is sent as the reply to a request:
 
 ```py
-+---------------------- Notification
-|              +--------- name        "chat message"
-|              |       +- payloadSize 46
-|              |       |
-n00cchat message0000002e{"message":"Hi","from":"nthn","room":"gonuts"}
++-------------------- RetryResult
+|   +------------------ requestID   "0001"
+|   |       +---------- wait        0
+|   |       |       +-- payloadSize 20
+|   |       |       |
+e00010000000000000014"service restarting"
 ```
 
-Notifications are never replied to nor can they cause "error" results.
+In this case — where `wait` is zero — the requestor is free to retry the request at its convenience.
+
+However in some scenarios the responder might require the requestor to wait for some time before retrying the request, in which case the `wait` property has a non-zero value:
+
+```py
++-------------------- RetryResult
+|   +------------------ requestID   "0001"
+|   |       +---------- wait        5000 ms
+|   |       |       +-- payloadSize 20
+|   |       |       |
+e00010000138800000014"request rate limit"
+```
+
+In this case the requestor must not retry the request until at least 5000 milliseconds has passed.
+
+If the protocol communication itself experiences issues—e.g. an illegal message is received—a ProtocolError is written and the connection is closed.
+
+**ProtocolError codes:**
+
+|  Code | Meaning              | Comments
+| ----: | -------------------- | -----------------------------------------------------------------
+|     0 | Abnormal             | Closed because of an abnormal condition (e.g. server fault, etc)
+|     1 | Unsupported protocol | The other side does not support the callers protocol
+|     2 | Invalid message      | An invalid message was transmitted
+|     3 | Timeout              | The other side closed the connection because communicating took too long
+
+Example of a peer which does not support the version of the protocol spoken by the sender:
+
+```py
++-------- ProtocolError
+|       +-- code 1
+|       |
+f00000001
+```
+
+### Streaming requests and results
 
 For more complicated scenarios there are "streaming-payload" requests and results at our disposal. This allows transmitting of large amounts of data without the need for large buffers. For example this could be used to forward audio data to audio playback hardware, or to transmit a large file off of slow media like a tape drive or hard-disk drive.
 
@@ -308,49 +368,100 @@ Because transmitting a streaming request or result does not occupy "the line" (s
 Here's an example of a "streaming-payload" request ...
 
 ```py
-+----------------- StreamRequest
-|  +---------------- requestID   "001"
-|  |      +--------- operation   "echo"
-|  |      |       +- payloadSize 11
-|  |      |       |
-s001004echo0000000b{"message":
++------------------ StreamRequest
+|   +---------------- requestID   "0001"
+|   |      +--------- operation   "echo" (text3Size 4, text3Value "echo")
+|   |      |       +- payloadSize 11
+|   |      |       |
+s0001004echo0000000b{"message":
 
-+----------------- streamReqPart
-|  +---------------- requestID   "001"
-|  |       +-------- payloadSize 14
-|  |       |
-p0010000000e"Hello World"}
++------------------ streamReqPart
+|   +---------------- requestID   "0001"
+|   |       +-------- payloadSize 14
+|   |       |
+p00010000000e"Hello World"}
 
-+----------------- streamReqPart
-|  +---------------- requestID   "001"
-|  |       +-------- payloadSize 0 (end of stream)
-|  |       |
-p00100000000
++------------------ streamReqPart
+|   +---------------- requestID   "0001"
+|   |       +-------- payloadSize 0 (end of stream)
+|   |       |
+p000100000000
 ```
 
 ... followed by a "streaming-payload" result:
 
 ```py
-+----------------- StreamResult (1st part)
-|  +---------------- requestID   "001"
-|  |       +-------- payloadSize 11
-|  |       |
-S0010000000b{"message":
++------------------ StreamResult (1st part)
+|   +---------------- requestID   "0001"
+|   |       +-------- payloadSize 11
+|   |       |
+S00010000000b{"message":
 
-+----------------- StreamResult (2nd part)
-|  +---------------- requestID   "001"
-|  |       +-------- payloadSize 14
-|  |       |
-S0010000000e"Hello World"}
++------------------ StreamResult (2nd part)
+|   +---------------- requestID   "0001"
+|   |       +-------- payloadSize 14
+|   |       |
+S00010000000e"Hello World"}
 
-+----------------- StreamResult
-|  +---------------- requestID   "001"
-|  |       +-------- payloadSize 0 (end of stream)
-|  |       |
-S00100000000
++------------------ StreamResult
+|   +---------------- requestID   "0001"
+|   |       +-------- payloadSize 0 (end of stream)
+|   |       |
+S000100000000
 ```
 
+Streaming requests occupy resources on the responder's side for the duration of the "stream session". Therefore handling of streaming requests should be limited and "RetryResult" used to throttle requests:
+
+```py
++-------------------- RetryResult
+|   +------------------ requestID   "0001"
+|   |       +---------- wait        5000 ms
+|   |       |       +-- payloadSize 19
+|   |       |       |
+e00010000138800000013"stream rate limit"
+```
+
+This means that the requestor must not send any new requests until `wait` time has passed.
+
+
+### Notifications
+
+When there's no expectation on a response, Gotalk provides a "notification" message type:
+
+```py
++---------------------- Notification
+|              +--------- name        "chat message" (text3Size 12, text3Value "chat message")
+|              |       +- payloadSize 46
+|              |       |
+n00cchat message0000002e{"message":"Hi","from":"nthn","room":"gonuts"}
+```
+
+Notifications are never replied to nor can they cause "error" results. Applications needing acknowledgement of notification delivery might consider using a request instead.
+
+
+### Heartbeats
+
+Because most responders will limit the time it waits for reads, a heartbeat message is send at a certain interval. When a heartbeat is sent is up to the implementation.
+
+A heartbeat contains the sender's local time in the form of an unsigned 32-bit UNIX timestamp. This is enought to cover usage until 2106. I really hope gotalk is nowhere to be found in 2106.
+
+It also contains an optional "load" value, indicating how pressured, or under what load, the sender is. 0 means "idle" and 65535 (0xffff) means "omg I think I'm dying." This can be used to distribute work to less loaded responders in a load-balancing setup.
+
+```py
++------------------ Heartbeat
+|   +--------- load 2
+|   |       +- time 2015-02-08 22:09:30 UTC
+|   |       |
+h000254d7de9a
+```
+
+
+### Notes
+
 Requests and results does not need to match on the "single" vs "streaming" detail — it's perfectly fine to send a streaming request and read a single response, or send a single response just to receive a streaming result. *The payload type is orthogonal to the message type*, with the exception of an error response which is always a "single-payload" message, carrying any information about the error in its payload. Note however that the current version of the Go package does not provide a high-level API for mixed-kind request-response handling.
+
+For transports which might need "heartbeats" to stay alive, like some raw TCP connections over the internet, the suggested way to implement this is by notifications, e.g. send a "heartbeat" notification at a ceretain interval while no requests are being sent. The Gotalk protocol does not include a "heartbeat" feature because of this reason, as well as the fact that some transports (like web socket) already provide "heartbeat" features.
+
 
 
 ## Other implementations

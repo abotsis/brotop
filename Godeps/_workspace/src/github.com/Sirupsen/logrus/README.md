@@ -2,9 +2,10 @@
 
 Logrus is a structured logger for Go (golang), completely API compatible with
 the standard library logger. [Godoc][godoc]. **Please note the Logrus API is not
-yet stable (pre 1.0), the core API is unlikely to change much but please version
-control your Logrus to make sure you aren't fetching latest `master` on every
-build.**
+yet stable (pre 1.0). Logrus itself is completely stable and has been used in
+many large deployments. The core API is unlikely to change much but please
+version control your Logrus to make sure you aren't fetching latest `master` on
+every build.**
 
 Nicely color-coded in development (when a TTY is attached, otherwise just
 plain text):
@@ -241,6 +242,9 @@ func init() {
 * [`github.com/johntdyer/slackrus`](https://github.com/johntdyer/slackrus)
   Hook for Slack chat.
 
+* [`github.com/wercker/journalhook`](https://github.com/wercker/journalhook).
+  Hook for logging to `systemd-journald`.
+
 #### Level logging
 
 Logrus has six logging levels: Debug, Info, Warning, Error, Fatal and Panic.
@@ -347,7 +351,7 @@ func (f *JSONFormatter) Format(entry *Entry) ([]byte, error) {
 
 #### Logger as an `io.Writer`
 
-Logrus can be transormed into an `io.Writer`. That writer is the end of an `io.Pipe` and it is your responsability to close it.
+Logrus can be transormed into an `io.Writer`. That writer is the end of an `io.Pipe` and it is your responsibility to close it.
 
 ```go
 w := logger.Writer()
@@ -366,7 +370,7 @@ and hooks. The level for those entries is `info`.
 #### Rotation
 
 Log rotation is not provided with Logrus. Log rotation should be done by an
-external program (like `logrotated(8)`) that can compress and delete old log
+external program (like `logrotate(8)`) that can compress and delete old log
 entries. It should not be a feature of the application-level logger.
 
 

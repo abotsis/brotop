@@ -4,6 +4,10 @@ CWD=$(shell pwd)
 NAME="brotop"
 DESCRIPTION="Top for bro log files."
 
+CCOS="darwin linux"
+CCARCH="amd64"
+CCOUTPUT="pkg/{{.OS}}-{{.Arch}}/$(NAME)"
+
 NO_COLOR=\033[0m
 OK_COLOR=\033[32;01m
 ERROR_COLOR=\033[31;01m
@@ -44,15 +48,22 @@ test: deps
 	godep go test ./...
 
 goxBuild:
-	gox -build-toolchain
+	@gox -os=$(CCOS) -arch=$(CCARCH) -build-toolchain
 
 gox: 
-	@$(ECHO) "$(OK_COLOR)==> GOX BroTop...$(NO_COLOR)"
-	gox output="pkg/{{.OS}}-{{.Arch}}/brotop"
+	@$(ECHO) "$(OK_COLOR)==> Cross Compiling $(NAME)$(NO_COLOR)"
+	@gox -os=$(CCOS) -arch=$(CCARCH) -output=$(CCOUTPUT)
+
+release: clean all gox
+	@mkdir -p release/
+	@echo $(CCOS) | xargs -n1 | xargs -I % tar -zcvf release/$(NAME)-%-amd64.tar.gz pkg/%-amd64/$(NAME)
+	@$(ECHO) "$(OK_COLOR)==> Done Cross Compiling $(NAME)$(NO_COLOR)"
 
 clean:
-	rm -rf bin/
-	rm -rf pkg/
+	@$(ECHO) "$(OK_COLOR)==> Cleaning$(NO_COLOR)"
+	@rm -rf release/
+	@rm -rf bin/
+	@rm -rf pkg/
 
 install: clean all
 
