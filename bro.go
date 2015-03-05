@@ -26,6 +26,7 @@ var (
 	BRO_LOCATIONS = []string{
 		"/opt/bro/logs/current",
 		"/usr/local/bro/logs/current",
+		"/nsm/bro/logs/current",
 	}
 )
 
