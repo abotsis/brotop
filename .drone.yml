@@ -24,7 +24,7 @@ publish:
       - make release
     artifacts:
       - release
-    tag: v$(shell cat brotop.go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$\)")
+    tag: v$(sh -C cat brotop.go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$\)")
     token: $$github_token
     user: criticalstack
     repo: brotop
