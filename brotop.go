@@ -130,6 +130,7 @@ func main() {
 			}
 
 			Broadcast("event", json)
+
 			log.WithFields(log.Fields{
 				"type":   msg.Self.Name,
 				"path":   msg.Self.Path,

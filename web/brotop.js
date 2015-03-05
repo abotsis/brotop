@@ -258,9 +258,12 @@ BroTop = {
 
     });
 
-    gotalk.connect('ws://'+document.location.host+'/gotalk', function (err, s) {
-      if (err) return console.error(err);
-      // s is a gotalk.Sock
+    // gotalk.connect('ws://'+document.location.host+'/gotalk', function (err, s) {
+      // if (err) return console.error(err);
+      // // s is a gotalk.Sock
+    // });
+    var s = gotalk.connection().on('open', function() {
+      // ..
     });
   },
 

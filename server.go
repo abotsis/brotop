@@ -21,7 +21,7 @@ func onAccept(s *gotalk.Sock) {
 	defer socksmu.Unlock()
 	Clients[s] = 1
 
-	s.CloseHandler = func(s *gotalk.Sock, c int) {
+	s.CloseHandler = func(s *gotalk.Sock, _ int) {
 		socksmu.Lock()
 		defer socksmu.Unlock()
 		delete(Clients, s)
@@ -31,15 +31,17 @@ func onAccept(s *gotalk.Sock) {
 func Broadcast(name string, in interface{}) {
 	socksmu.RLock()
 	defer socksmu.RUnlock()
+
 	for s, _ := range Clients {
 		s.Notify(name, in)
 	}
 }
 
 func StartServer() {
-	gotalkws := gotalk.WebSocketHandler()
-	http.Handle("/gotalk", gotalkws)
-	gotalkws.OnAccept = onAccept
+	ws := gotalk.WebSocketHandler()
+	ws.OnAccept = onAccept
+
+	http.Handle("/gotalk/", ws)
 
 	// for dev
 	// http.Handle("/", http.FileServer(http.Dir("./web/")))
