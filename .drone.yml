@@ -3,8 +3,6 @@ git:
   path: github.com/criticalstack/brotop
   branch: master
 script:
-  - aptitude install sudo
-  - sudo apt-get update
   - make test
 notify:
   email:
@@ -17,14 +15,14 @@ notify:
     on_started: false
     on_success: true
     on_failure: true
-publish:
-  github:
-    branch: master
-    script:
-      - make release
-    artifacts:
-      - release
-    tag: v$(cat brotop.go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$\)")
-    token: $$github_token
-    user: criticalstack
-    repo: brotop
+# publish:
+  # github:
+    # branch: master
+    # script:
+      # - make release
+    # artifacts:
+      # - release
+    # tag: v$(cat brotop.go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$\)")
+    # token: $$github_token
+    # user: criticalstack
+    # repo: brotop
