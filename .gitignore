@@ -9,6 +9,7 @@ bindata.go
 
 pkg/
 release/
+.Version
 
 log/
 

@@ -56,12 +56,14 @@ gox:
 
 release: clean all gox
 	@mkdir -p release/
+	@echo $(VERSION) > .Version
 	@echo $(CCOS) | xargs -n1 | xargs -I % tar -zcvf release/$(NAME)-%-amd64.tar.gz pkg/%-amd64/$(NAME)
 	@echo $(CCOS) | xargs -n1 | xargs -I % tar -zcvf release/$(NAME)-%-386.tar.gz pkg/%-386/$(NAME)
 	@$(ECHO) "$(OK_COLOR)==> Done Cross Compiling $(NAME)$(NO_COLOR)"
 
 clean:
 	@$(ECHO) "$(OK_COLOR)==> Cleaning$(NO_COLOR)"
+	@rm -rf .Version
 	@rm -rf release/
 	@rm -rf bin/
 	@rm -rf pkg/

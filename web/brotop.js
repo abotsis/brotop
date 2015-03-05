@@ -145,6 +145,22 @@ Collection.prototype.Add = function(json) {
 var BroTop;
 
 BroTop = {
+
+  SetVersion: function() {
+    if (BroTop.VersionRequest) {
+      BroTop.VersionRequest.abort();
+    }
+
+    BroTop.VersionRequest = $.ajax({
+      url: "/version",
+      dataType: "json",
+      type: "get",
+      success: function(data) {
+        $("span.version").html("v " + data.version)
+      }
+    });
+  },
+
   max: 5,
   collection: {},
   templates: {},
@@ -279,6 +295,9 @@ BroTop = {
 }
 
 jQuery(document).ready(function($) {
+
+  BroTop.SetVersion();
+
   var source = $("#collection").html();
   BroTop.templates.collection = Handlebars.compile(source);
 

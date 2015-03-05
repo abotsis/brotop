@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"sync"
+	"text/template"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/elazarl/go-bindata-assetfs"
@@ -37,6 +39,17 @@ func Broadcast(name string, in interface{}) {
 	}
 }
 
+func handler(w http.ResponseWriter, r *http.Request) {
+	body, err := Asset("web/index.html")
+
+	if err != nil {
+	}
+
+	t, _ := template.New("index").Parse(fmt.Sprintf("{{define 'Version'}}%s{{end}}", string(body)))
+
+	t.ExecuteTemplate(w, "Version", Version)
+}
+
 func StartServer() {
 	ws := gotalk.WebSocketHandler()
 	ws.OnAccept = onAccept
@@ -55,6 +68,23 @@ func StartServer() {
 			},
 		),
 	)
+
+	http.HandleFunc("/version", func(w http.ResponseWriter, r *http.Request) {
+		jdata := make(map[string]string)
+
+		jdata["version"] = Version
+
+		js, err := json.Marshal(jdata)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+
+		w.Write(js)
+	})
 
 	var port string = ":8080"
 
