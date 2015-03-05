@@ -54,7 +54,7 @@ gox:
 	@$(ECHO) "$(OK_COLOR)==> Cross Compiling $(NAME)$(NO_COLOR)"
 	# Super hack because godep sucks
 	@mkdir -p Godeps/_workspace/src/github.com/criticalstack/brotop
-	@cp -R *.go models Godeps/_workspace/src/github.com/criticalstack/brotop
+	@cp -R *.go web Godeps/_workspace/src/github.com/criticalstack/brotop
 	@GOPATH=$(shell godep path) gox -os=$(CCOS) -arch=$(CCARCH) -output=$(CCOUTPUT)
 	@rm -rf Godeps/_workspace/src/github.com/criticalstack/brotop
 
