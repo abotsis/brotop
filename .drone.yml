@@ -19,7 +19,6 @@ notify:
 publish:
   github:
     branch: master
-    draft: true
     script:
       - make release
     artifacts:
