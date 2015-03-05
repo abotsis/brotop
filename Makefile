@@ -52,7 +52,11 @@ goxBuild:
 
 gox: 
 	@$(ECHO) "$(OK_COLOR)==> Cross Compiling $(NAME)$(NO_COLOR)"
-	@gox -os=$(CCOS) -arch=$(CCARCH) -output=$(CCOUTPUT)
+	# Super hack because godep sucks
+	@mkdir -p Godeps/_workspace/src/github.com/criticalstack/brotop
+	@cp -R *.go models Godeps/_workspace/src/github.com/criticalstack/brotop
+	@GOPATH=$(shell godep path) gox -os=$(CCOS) -arch=$(CCARCH) -output=$(CCOUTPUT)
+	@rm -rf Godeps/_workspace/src/github.com/criticalstack/brotop
 
 release: clean all gox
 	@mkdir -p release/
@@ -63,6 +67,7 @@ release: clean all gox
 
 clean:
 	@$(ECHO) "$(OK_COLOR)==> Cleaning$(NO_COLOR)"
+	@rm -rf Godeps/_workspace/src/github.com/criticalstack/brotop
 	@rm -rf .Version
 	@rm -rf release/
 	@rm -rf bin/
