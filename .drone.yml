@@ -1,7 +1,8 @@
 image: mephux/docker-golang
 git:
   path: github.com/criticalstack/brotop
-  branch: master
+  branches:
+    - master
 script:
   - apt-get update -qq
   - apt-get install sudo
@@ -19,7 +20,7 @@ notify:
     on_failure: true
 publish:
   github:
-    branch: stable
+    branch: master
     script:
       - make release
     artifacts:
