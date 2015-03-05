@@ -4,8 +4,6 @@ git:
   branches:
     - master
 script:
-  - apt-get update -qq
-  - apt-get install sudo
   - make test
 notify:
   email:
@@ -15,7 +13,7 @@ notify:
     username: $$USERNAME
     webhook_url: $$WEBHOOK
     channel: $$CHANNEL
-    on_started: false
+    on_started: true
     on_success: true
     on_failure: true
 publish:
