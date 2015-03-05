@@ -17,11 +17,12 @@ import (
 
 const (
 	Name    = "brotop"
-	Version = "0.2.1"
+	Version = "0.2.2"
 )
 
 var (
 	Debug          = kingpin.Flag("debug", "Enable debug mode.").Bool()
+	Flush          = kingpin.Flag("flush", "Remove the BroTop cache. (~/.brotop/brotop.db)").Bool()
 	DefaultLogPath = kingpin.Flag("path", "Bro log path.").ExistingDir()
 	ServerPort     = kingpin.Flag("port", "Web server port.").Short('p').String()
 	Quiet          = kingpin.Flag("quiet", "Remove all output logging.").Short('q').Bool()
@@ -60,8 +61,20 @@ func main() {
 
 	log.Debug("Looking for BroTop database.")
 	brotopPath := path.Join(home, ".brotop")
+	brotopDB := path.Join(brotopPath, "brotop.db")
+
+	if *Flush {
+		if com.IsExist(brotopDB) {
+			err := os.Remove(brotopDB)
+
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	}
+
 	os.Mkdir(brotopPath, 0777)
-	store, err := NewStore(path.Join(brotopPath, "brotop.db"), 0600, 1*time.Second)
+	store, err := NewStore(brotopDB, 0600, 1*time.Second)
 
 	if err != nil {
 		log.Fatal(err)
@@ -125,20 +138,18 @@ func main() {
 
 			json, err := msg.Json()
 
-			if err != nil {
-				log.Error(err)
+			if err == nil {
+				Broadcast("event", json)
+
+				log.WithFields(log.Fields{
+					"type":   msg.Self.Name,
+					"path":   msg.Self.Path,
+					"length": len(json),
+					"offset": msg.Offset,
+				}).Debugf("Sending Json Event (%s)", msg.Self.Name)
+
+				store.Set(msg.Self.Path, fmt.Sprintf("%d", msg.Offset))
 			}
-
-			Broadcast("event", json)
-
-			log.WithFields(log.Fields{
-				"type":   msg.Self.Name,
-				"path":   msg.Self.Path,
-				"length": len(json),
-				"offset": msg.Offset,
-			}).Debugf("Sending Json Event (%s)", msg.Self.Name)
-
-			store.Set(msg.Self.Path, fmt.Sprintf("%d", msg.Offset))
 
 		case <-DoneChan:
 			log.Info("Closing Open Files...")
