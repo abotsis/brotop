@@ -3,7 +3,8 @@ git:
   path: github.com/criticalstack/brotop
   branch: master
 script:
-  - apt-get install aptitude
+  - apt-get update -qq
+  - apt-get install sudo
   - make test
 notify:
   email:
