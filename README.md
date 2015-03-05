@@ -19,12 +19,12 @@ debugging and a real-time glimpse into whats being processed.
     * [brotop linux/386](https://github.com/criticalstack/brotop/releases/download/v0.2.1/brotop-linux-386.tar.gz)
 
   * Macosx
-    * [brotop darwin/amd64](https://github.com/criticalstack/brotop/releases/download/v0.2.1/brotop-linux-amd64.tar.gz)
-    * [brotop darwin/386](https://github.com/criticalstack/brotop/releases/download/v0.2.1/brotop-linux-386.tar.gz)
+    * [brotop darwin/amd64](https://github.com/criticalstack/brotop/releases/download/v0.2.1/brotop-darwin-amd64.tar.gz)
+    * [brotop darwin/386](https://github.com/criticalstack/brotop/releases/download/v0.2.1/brotop-darwin-386.tar.gz)
 
   * Freebsd
-    * [brotop freebsd/amd64](https://github.com/criticalstack/brotop/releases/download/v0.2.1/brotop-linux-amd64.tar.gz)
-    * [brotop freebsd/386](https://github.com/criticalstack/brotop/deleases/download/v0.2.1/brotop-linux-386.tar.gz)
+    * [brotop freebsd/amd64](https://github.com/criticalstack/brotop/releases/download/v0.2.1/brotop-freebsd-amd64.tar.gz)
+    * [brotop freebsd/386](https://github.com/criticalstack/brotop/releases/download/v0.2.1/brotop-freebsd-386.tar.gz)
 
 # Usage
 
