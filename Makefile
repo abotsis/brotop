@@ -4,8 +4,8 @@ CWD=$(shell pwd)
 NAME="brotop"
 DESCRIPTION="Top for bro log files."
 
-CCOS="darwin linux"
-CCARCH="amd64"
+CCOS="freebsd darwin linux"
+CCARCH="386 amd64"
 CCOUTPUT="pkg/{{.OS}}-{{.Arch}}/$(NAME)"
 
 NO_COLOR=\033[0m
@@ -57,6 +57,7 @@ gox:
 release: clean all gox
 	@mkdir -p release/
 	@echo $(CCOS) | xargs -n1 | xargs -I % tar -zcvf release/$(NAME)-%-amd64.tar.gz pkg/%-amd64/$(NAME)
+	@echo $(CCOS) | xargs -n1 | xargs -I % tar -zcvf release/$(NAME)-%-386.tar.gz pkg/%-386/$(NAME)
 	@$(ECHO) "$(OK_COLOR)==> Done Cross Compiling $(NAME)$(NO_COLOR)"
 
 clean:
