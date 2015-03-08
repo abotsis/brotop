@@ -1,23 +1,41 @@
 var guid = (function() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
-               .toString(16)
-               .substring(1);
+      .toString(16)
+      .substring(1);
   }
   return function() {
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-           s4() + '-' + s4() + s4() + s4();
+      s4() + '-' + s4() + s4() + s4();
   };
 })();
 
 var Event;
 
 function Event(json) {
-  this.data = json; 
+  this.data = json;
   this.parent = $("#" + json.type);
   this.id = guid();
   this.data.id = this.id;
   this.template = BroTop.templates.event;
+
+
+  if (!BroTop.Columns.hasOwnProperty(this.data.type)) {
+    BroTop.Columns[this.data.type] = {}
+  }
+
+  var type = this.data.type;
+
+  for (item in this.data.data) {
+    var value = this.data.data[item].field
+
+    if (!BroTop.Columns[type].hasOwnProperty(value)) {
+      BroTop.Columns[type][value] = true
+    }
+
+    this.data.data[item].show = BroTop.Columns[type][value];
+  }
+
 }
 
 Event.prototype.Render = function() {
@@ -61,6 +79,11 @@ Collection.prototype.Minimize = function() {
 
   $(self.id).removeClass("full-screen")
 
+  BroTop.Columns = {}
+  $("table", self.id).find("th").show();
+  $("table", self.id).find("td").show();
+
+  $(".column-options", self.id).hide();
   $(self.id).find(".display").off("scroll");
 }
 
@@ -75,17 +98,20 @@ Collection.prototype.Maximise = function() {
 
   $(self.id).addClass("full-screen")
 
-  $(self.id).find(".display").on("scroll", function(e) {
+  $(".display", self.id).on("scroll", function(e) {
     var elem = $(e.currentTarget);
-
-    console.log(elem)
+    var t = $("table", e.currentTarget);
 
     if (elem[0].scrollHeight - elem.scrollTop() == elem.outerHeight()) {
       self.allowScroll = true;
     } else {
       self.allowScroll = false;
     }
+
   });
+
+  $(".column-options", self.id).show();
+  $(".display", self.id).trigger("scroll");
 }
 
 Collection.prototype.Show = function() {
@@ -114,7 +140,8 @@ Collection.prototype.Cleanup = function() {
 
 Collection.prototype.Scroll = function() {
   var self = this;
-  var $item = $(self.id).find(".display");
+
+  var $item = $(".display", self.id);
 
   if (self.allowScroll) {
     $item.scrollTop($item[0].scrollHeight)
@@ -166,6 +193,8 @@ BroTop = {
   templates: {},
   Count: {},
 
+  Columns: {},
+
   Graph: {
     Run: null,
 
@@ -211,7 +240,7 @@ BroTop = {
           i.Minimize();
           i.Show();
         }
-      
+
       } else {
         for (item in BroTop.collection) {
           var i = BroTop.collection[item]
@@ -221,7 +250,6 @@ BroTop = {
 
         var c = BroTop.collection[type];
 
-        console.log("GOT CLICK", self, type, c)
         c.Show();
         c.Maximise();
       }
@@ -236,26 +264,21 @@ BroTop = {
 
     var chart = new SmoothieChart({
       grid: {
-        fillStyle:'#14171b'
+        fillStyle: '#14171b'
       }
     });
 
-    chart.addTimeSeries(BroTop.Graph.TS, { 
-      strokeStyle: '#e47078', 
-      fillStyle: 'rgba(228,112,120,0.22)', 
-      lineWidth: 4 
+    chart.addTimeSeries(BroTop.Graph.TS, {
+      strokeStyle: '#e47078',
+      fillStyle: 'rgba(228,112,120,0.22)',
+      lineWidth: 4
     });
     chart.streamTo(document.getElementById("main-chart"), 500);
 
-    gotalk.handleNotification('event', function (event) {
+    gotalk.handleNotification('event', function(event) {
       var json = JSON.parse(event)
-      // console.log(json)
 
       if (json.hasOwnProperty("type")) {
-
-        if (json.type === BroTop.current) {
-          BroTop.collection[json.type].Scroll();
-        }
 
         BroTop.Graph.update(json.type);
 
@@ -269,15 +292,16 @@ BroTop = {
         }
 
         BroTop.collection[json.type].Add(json);
+
+        if (json.type === BroTop.current) {
+          BroTop.collection[json.type].Scroll();
+        }
+
       }
 
 
     });
 
-    // gotalk.connect('ws://'+document.location.host+'/gotalk', function (err, s) {
-      // if (err) return console.error(err);
-      // // s is a gotalk.Sock
-    // });
     var s = gotalk.connection().on('open', function() {
       // ..
     });
@@ -290,6 +314,24 @@ BroTop = {
       item.max = max;
       item.Cleanup();
     }
+  },
+
+  ShowColumns: function(parent, type) {
+    BroTop.Columns[parent][type] = true;
+    var p = $("#" + parent);
+    var t = $("table", p);
+
+    t.find("th[data-name='"+type+"']").show()
+    t.find("td[data-field='"+type+"']").show()
+  },
+
+  HideColumns: function(parent, type) {
+    BroTop.Columns[parent][type] = false;
+    var p = $("#" + parent);
+    var t = $("table", p);
+
+    t.find("th[data-name='"+type+"']").hide()
+    t.find("td[data-field='"+type+"']").hide()
   }
 
 }
@@ -306,6 +348,23 @@ jQuery(document).ready(function($) {
 
   var source = $("#sidebar-item").html();
   BroTop.templates.collectionSidebar = Handlebars.compile(source);
+
+  $(document).on("change", "input.column-checkbox", function() {
+    var checked = $(this).is(":checked");
+    var parent = $(this).attr("data-parent");
+    var type = $(this).attr("data-type");
+
+    if (!BroTop.Columns.hasOwnProperty(parent)) {
+      BroTop.Columns[parent] = {} 
+    }
+
+    if (checked) {
+      BroTop.ShowColumns(parent, type)
+    } else {
+      BroTop.HideColumns(parent, type)
+    }
+  });
+
 
   BroTop.Init()
 });

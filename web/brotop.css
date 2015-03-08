@@ -98,6 +98,13 @@ code, pre {
 
 html, body {
   background: #21252C;
+
+   -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 #sidebar {
@@ -250,6 +257,13 @@ td {
   text-overflow: ellipsis;
   height: 25px;
   line-height: 25px;
+
+   -webkit-touch-callout: text;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
 
 .terminals {
@@ -403,14 +417,14 @@ padding:5px 0 5px 45px;
   top: 10px;
   bottom: 10px;
   right: 10px;
-  left: 10px;
+  left: 200px;
   z-index: 999999;
   overflow-x: hidden;
   overflow-y: scroll;
 }
 
 
-<F28>/* @group Scroll Bar */
+/* @group Scroll Bar */
 
 .scrollbar,
 .scrollbar-hide {
@@ -466,3 +480,18 @@ padding:5px 0 5px 45px;
 }
 
 /* @end */
+
+
+.column-options {
+  background-color: #232930;
+  margin-top: 10px;
+  width: 190px;
+  padding: 10px;
+  margin-left: -5px;
+}
+
+.column-options li{
+  white-space: nowrap;
+  overflow: hidden;         /* <- this does seem to be required */
+  text-overflow: ellipsis;
+}

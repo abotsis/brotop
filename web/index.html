@@ -12,6 +12,7 @@
     <script type="text/javascript" src="handlebars.js"></script>
     <script type="text/javascript" src="d3.min.js"></script>
     <script type="text/javascript" src="smoothie.js"></script>
+    <script type="text/javascript" src="table-header.js"></script>
     <script type="text/javascript" src="brotop.js"></script>
 
     <link rel="stylesheet" href="grid.css">
@@ -72,6 +73,16 @@
         </header>
         <div class="terminal-window">
           <div class="terminal">
+
+            <ul class="column-options" style="display:none;">
+            {{#each fields}}
+            <li data-name="{{this}}">
+            <input data-parent="{{../type}}" data-type="{{this}}" checked id="checkbox-{{../type}}-{{this}}" class="column-checkbox" type="checkbox" name="">
+            {{this}}
+            </li>
+            {{/each}}
+            </ul>
+
             <div class="display scrollbar">
 
       <table id="collection-table-{{type}}">
@@ -102,7 +113,9 @@
     <script id="event" type="text/x-handlebars-template">
       <tr id="{{id}}" class='event' data-type="{{type}}">
         {{#each data}}
-        <td title="{{this.value}}" data-field="{{this.field}}" cdata-type="{{this.type}}">{{this.value}}</td>
+        <td {{#if this.show}}{{else}}style="display:none;"{{/if}} title="{{this.field}}: {{this.value}}" data-field="{{this.field}}" data-type="{{this.type}}">
+        {{this.value}}
+        </td>
         {{/each}}
       </tr>
     </script>
