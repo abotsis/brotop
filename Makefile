@@ -4,8 +4,8 @@ CWD=$(shell pwd)
 NAME="brotop"
 DESCRIPTION="Top for bro log files."
 
-CCOS="freebsd darwin linux"
-CCARCH="386 amd64"
+CCOS=windows freebsd darwin linux
+CCARCH=386 amd64
 CCOUTPUT="pkg/{{.OS}}-{{.Arch}}/$(NAME)"
 
 NO_COLOR=\033[0m
@@ -48,21 +48,26 @@ test: deps
 	godep go test ./...
 
 goxBuild:
-	@gox -os=$(CCOS) -arch=$(CCARCH) -build-toolchain
+	@gox -os="$(CCOS)" -arch="$(CCARCH)" -build-toolchain
 
 gox: 
 	@$(ECHO) "$(OK_COLOR)==> Cross Compiling $(NAME)$(NO_COLOR)"
 	# Super hack because godep sucks
 	@mkdir -p Godeps/_workspace/src/github.com/criticalstack/brotop
 	@cp -R *.go web Godeps/_workspace/src/github.com/criticalstack/brotop
-	@GOPATH=$(shell godep path) gox -os=$(CCOS) -arch=$(CCARCH) -output=$(CCOUTPUT)
+	@GOPATH=$(shell godep path) gox -os="$(CCOS)" -arch="$(CCARCH)" -output=$(CCOUTPUT)
 	@rm -rf Godeps/_workspace/src/github.com/criticalstack/brotop
 
 release: clean all gox
 	@mkdir -p release/
 	@echo $(VERSION) > .Version
-	@echo $(CCOS) | xargs -n1 | xargs -I % tar -zcvf release/$(NAME)-%-amd64.tar.gz pkg/%-amd64/$(NAME)
-	@echo $(CCOS) | xargs -n1 | xargs -I % tar -zcvf release/$(NAME)-%-386.tar.gz pkg/%-386/$(NAME)
+	@for os in $(CCOS); do \
+		for arch in $(CCARCH); do \
+			cd pkg/$$os-$$arch/; \
+			tar -zcvf ../../release/$(NAME)-$$os-$$arch.tar.gz rmslack* > /dev/null 2>&1; \
+			cd ../../; \
+		done \
+	done
 	@$(ECHO) "$(OK_COLOR)==> Done Cross Compiling $(NAME)$(NO_COLOR)"
 
 clean:
