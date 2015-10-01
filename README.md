@@ -54,4 +54,3 @@ Flags:
 # Package as dep or rpm
 
   `make package`
-
