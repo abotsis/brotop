@@ -2,7 +2,7 @@
 
 [![Build Status](http://104.236.125.70/api/badge/github.com/criticalstack/brotop/status.svg?branch=master)](http://104.236.125.70/github.com/criticalstack/brotop)
 
-<img height="300px" width="" src="https://raw.githubusercontent.com/mephux/brotop/master/brotop.png?token=AABXAe5HY1UJns_gRtUyUvLqkMRYtnRAks5U4Ou_wA%3D%3D">
+<img height="300px" width="" src="https://raw.githubusercontent.com/criticalstack/brotop/3609c191858fcec02b68c7c4b0b85d4692af866c/brotop.png">
 
 Brotop lets you stream your bro logs to the browser for easy 
 debugging and a real-time glimpse into whats being processed.
