@@ -1,4 +1,4 @@
-# brotop - Top for bro logs.
+## brotop - Top for bro logs.
 
 [![Build Status](http://104.236.125.70/api/badge/github.com/criticalstack/brotop/status.svg?branch=master)](http://104.236.125.70/github.com/criticalstack/brotop)
 
