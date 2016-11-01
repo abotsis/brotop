@@ -30,7 +30,7 @@
 		},
 		{
 			"ImportPath": "github.com/elazarl/go-bindata-assetfs",
-			"Rev": "09ba9c6a7e9a5ee35586127fdf88bb20bb4990b7"
+			"Rev": "9a6736ed45b44bf3835afeebb3034b57ed329f3e"
 		},
 		{
 			"ImportPath": "github.com/howeyc/fsnotify",
