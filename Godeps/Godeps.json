@@ -1,9 +1,29 @@
 {
-	"ImportPath": "github.com/criticalstack/brotop",
-	"GoVersion": "go1.4.1",
+	"ImportPath": "github.com/mchechik/brotop",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v75",
+	"Packages": [
+		".\\..."
+	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/ActiveState/tail",
+			"Rev": "068b72961a6bc5b4a82cf4fc14ccc724c0cfa73a"
+		},
+		{
+			"ImportPath": "github.com/ActiveState/tail/ratelimiter",
+			"Rev": "068b72961a6bc5b4a82cf4fc14ccc724c0cfa73a"
+		},
+		{
+			"ImportPath": "github.com/ActiveState/tail/util",
+			"Rev": "068b72961a6bc5b4a82cf4fc14ccc724c0cfa73a"
+		},
+		{
+			"ImportPath": "github.com/ActiveState/tail/watch",
+			"Rev": "068b72961a6bc5b4a82cf4fc14ccc724c0cfa73a"
+		},
+		{
+			"ImportPath": "github.com/ActiveState/tail/winfile",
 			"Rev": "068b72961a6bc5b4a82cf4fc14ccc724c0cfa73a"
 		},
 		{
@@ -39,6 +59,10 @@
 		},
 		{
 			"ImportPath": "github.com/rsms/gotalk",
+			"Rev": "8424c387046410d50ce7bb3d3125fa89fadf7ac8"
+		},
+		{
+			"ImportPath": "github.com/rsms/gotalk/js",
 			"Rev": "8424c387046410d50ce7bb3d3125fa89fadf7ac8"
 		},
 		{
