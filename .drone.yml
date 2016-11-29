@@ -27,7 +27,7 @@ build:
       - go get github.com/tools/godep
       - go get github.com/jteeuwen/go-bindata/...
       - go get github.com/mitchellh/gox
-      - gem install fpm --no-rdoc --no-ri
+      # - gem install fpm --no-rdoc --no-ri
       - make release
     when:
       event: [tag]
