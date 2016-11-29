@@ -59,17 +59,14 @@ goxBuild:
 
 gox: 
 	@$(ECHO) "$(OK_COLOR)==> Cross Compiling $(NAME)$(NO_COLOR)"
-	# @mkdir -p Godeps/_workspace/src/github.com/criticalstack/brotop
-	# @cp -R *.go web Godeps/_workspace/src/github.com/criticalstack/brotop
 	@gox -os="$(CCOS)" -arch="$(CCARCH)" -output=$(CCOUTPUT)
-	# @rm -rf Godeps/_workspace/src/github.com/criticalstack/brotop
 
 release: clean all gox
 	@mkdir -p release/
 	@for os in $(CCOS); do \
 		for arch in $(CCARCH); do \
 			cd pkg/$$os-$$arch/; \
-			tar -zcvf ../../release/$(NAME)-$$os-$$arch.tar.gz rmslack* > /dev/null 2>&1; \
+			tar -zcvf ../../release/$(NAME)-$$os-$$arch.tar.gz brotop* > /dev/null 2>&1; \
 			cd ../../; \
 		done \
 	done
@@ -77,8 +74,7 @@ release: clean all gox
 
 clean:
 	@$(ECHO) "$(OK_COLOR)==> Cleaning$(NO_COLOR)"
-	@rm -rf Godeps/_workspace/src/github.com/criticalstack/brotop
-	@rm -rf .Version
+	@rm -rf VERSION
 	@rm -rf release/
 	@rm -rf bin/
 	@rm -rf pkg/
