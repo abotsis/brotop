@@ -1,4 +1,10 @@
-VERSION=$(shell cat brotop.go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$\)")
+VERSION=$(shell cat VERSION)
+BUILDVERSION=$(shell cat VERSION)
+GO_VERSION=$(shell go version)
+
+# Get the git commit
+SHA=$(shell git rev-parse --short HEAD)
+BUILD_COUNT=$(shell git rev-list --count HEAD)
 CWD=$(shell pwd)
 
 NAME="brotop"
@@ -26,6 +32,7 @@ all: deps
 	@$(ECHO) "$(OK_COLOR)==> Building $(NAME) - $(VERSION) $(NO_COLOR)"
 	@godep go build -o bin/$(NAME)
 	@chmod +x bin/$(NAME)
+	@./bin/$(NAME) --version 2> VERSION
 	@$(ECHO) "$(OK_COLOR)==> Done$(NO_COLOR)"
 
 
