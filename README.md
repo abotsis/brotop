@@ -14,7 +14,7 @@ debugging and a real-time glimpse into whats being processed.
 
 # Download
 
-    * [Releases](https://github.com/criticalstack/brotop/releases)
+  * [Releases](https://github.com/criticalstack/brotop/releases)
 
 # Usage
 
