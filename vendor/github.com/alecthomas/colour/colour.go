@@ -1,5 +1,7 @@
 // Package colour ([docs][1]) provides [Quake-style colour formatting][2] for Unix terminals.
 //
+// It is a drop-in replacement for the fmt package.
+//
 // The package level functions can be used to write to stdout (or strings or
 // other files). If stdout is not a terminal, colour formatting will be
 // stripped.
@@ -45,10 +47,12 @@ import (
 	"io"
 	"os"
 	"regexp"
+
+	"github.com/mattn/go-isatty"
 )
 
 var (
-	extract = regexp.MustCompile(`(\^[0-9a-fRUB])|(\^\^)|([^^]+)`)
+	extract = regexp.MustCompile(`(\^[0-9a-fRDUB])|(\^\^)|([^^]+)`)
 	colours = map[byte]string{
 		'0': "\033[30m",
 		'1': "\033[31m",
@@ -68,12 +72,15 @@ var (
 		'e': "\033[46m",
 		'f': "\033[47m",
 
-		'R': "\033[0m",
+		'R': "\033[0m", // reset
+		'B': "\033[1m", // bold
+		'D': "\033[2m", // dim
 		'U': "\033[4m",
-		'B': "\033[1m",
 	}
 
+	// Stdout is an conditional colour writer for os.Stdout.
 	Stdout = TTY(os.Stdout)
+	// Stderr is an conditional colour writer for os.Stderr.
 	Stderr = TTY(os.Stderr)
 )
 
@@ -88,7 +95,7 @@ func Sprintln(args ...interface{}) string {
 }
 
 func Fprintln(w io.Writer, args ...interface{}) (n int, err error) {
-	return Colour(w).Println(args...)
+	return TTY(w).Println(args...)
 }
 
 func Print(args ...interface{}) (n int, err error) {
@@ -102,7 +109,7 @@ func Sprint(args ...interface{}) string {
 }
 
 func Fprint(w io.Writer, args ...interface{}) (n int, err error) {
-	return Colour(w).Print(args...)
+	return TTY(w).Print(args...)
 }
 
 func Printf(format string, args ...interface{}) (n int, err error) {
@@ -116,7 +123,7 @@ func Sprintf(format string, args ...interface{}) string {
 }
 
 func Fprintf(w io.Writer, format string, args ...interface{}) (n int, err error) {
-	return Colour(w).Printf(format, args...)
+	return TTY(w).Printf(format, args...)
 }
 
 // A Printer implements functions that accept Quake-style colour formatting
@@ -130,7 +137,7 @@ type Printer interface {
 // TTY creates a Printer that colourises output if w is a terminal, or strips
 // formatting if it is not.
 func TTY(w io.Writer) Printer {
-	if f, ok := w.(*os.File); ok && isTerminal(f) {
+	if f, ok := w.(*os.File); ok && isatty.IsTerminal(f.Fd()) {
 		return &colourPrinter{w}
 	}
 	return &stripPrinter{w}
@@ -238,13 +245,6 @@ func StripFormatting(s string) string {
 		}
 	}
 	return out.String()
-}
-
-func formatStringIfTty(w *os.File, s string) string {
-	if isTerminal(w) {
-		return FormatString(s)
-	}
-	return StripFormatting(s)
 }
 
 func stripArgs(args ...interface{}) []interface{} {

@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ActiveState/tail"
+	"github.com/hpcloud/tail"
 )
 
 var (

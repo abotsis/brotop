@@ -9,9 +9,9 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 
-	"github.com/ActiveState/tail"
 	"github.com/Unknwon/com"
 	_ "github.com/alecthomas/colour"
+	"github.com/hpcloud/tail"
 	"gopkg.in/alecthomas/kingpin.v1"
 )
 
@@ -160,7 +160,7 @@ func main() {
 
 			log.Info("Cleaning up...")
 			store.Close()
-			tail.Cleanup()
+			// tail.Cleanup()
 
 			os.Exit(1)
 		}

@@ -1,78 +1,92 @@
 {
-	"ImportPath": "github.com/mchechik/brotop",
+	"ImportPath": "github.com/criticalstack/brotop",
 	"GoVersion": "go1.7",
 	"GodepVersion": "v75",
 	"Packages": [
-		".\\..."
+		"./..."
 	],
 	"Deps": [
 		{
-			"ImportPath": "github.com/ActiveState/tail",
-			"Rev": "068b72961a6bc5b4a82cf4fc14ccc724c0cfa73a"
-		},
-		{
-			"ImportPath": "github.com/ActiveState/tail/ratelimiter",
-			"Rev": "068b72961a6bc5b4a82cf4fc14ccc724c0cfa73a"
-		},
-		{
-			"ImportPath": "github.com/ActiveState/tail/util",
-			"Rev": "068b72961a6bc5b4a82cf4fc14ccc724c0cfa73a"
-		},
-		{
-			"ImportPath": "github.com/ActiveState/tail/watch",
-			"Rev": "068b72961a6bc5b4a82cf4fc14ccc724c0cfa73a"
-		},
-		{
-			"ImportPath": "github.com/ActiveState/tail/winfile",
-			"Rev": "068b72961a6bc5b4a82cf4fc14ccc724c0cfa73a"
-		},
-		{
 			"ImportPath": "github.com/Sirupsen/logrus",
-			"Comment": "v0.6.5-2-geb84da5",
-			"Rev": "eb84da520d0bfecda7a9288107ec991b4ebcedb4"
+			"Comment": "v0.10.0-38-g3ec0642",
+			"Rev": "3ec0642a7fb6488f65b06f9040adc67e3990296a"
 		},
 		{
 			"ImportPath": "github.com/Unknwon/com",
-			"Rev": "188d690b1aea28bf00ba76983aa285b1d322e3dd"
+			"Comment": "v1",
+			"Rev": "28b053d5a2923b87ce8c5a08f3af779894a72758"
 		},
 		{
 			"ImportPath": "github.com/alecthomas/colour",
-			"Rev": "cb73eedc0e902baee08569b262da980fec6ca243"
+			"Rev": "60882d9e27213e8552dcff6328914fe4c2b44bc9"
 		},
 		{
 			"ImportPath": "github.com/alecthomas/units",
-			"Rev": "6b4e7dc5e3143b85ea77909c72caf89416fc2915"
+			"Rev": "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a"
 		},
 		{
 			"ImportPath": "github.com/boltdb/bolt",
-			"Comment": "v1.0-43-gcf33c9e",
-			"Rev": "cf33c9e0ca0a23509b8bb8edfc63e4776bb1a330"
+			"Comment": "v1.3.0-34-g0d9f544",
+			"Rev": "0d9f544bb94aac29c185968483459ef74d6deb5d"
 		},
 		{
 			"ImportPath": "github.com/elazarl/go-bindata-assetfs",
 			"Rev": "9a6736ed45b44bf3835afeebb3034b57ed329f3e"
 		},
 		{
-			"ImportPath": "github.com/howeyc/fsnotify",
-			"Comment": "v0.9.0-14-g4894fe7",
-			"Rev": "4894fe7efedeeef21891033e1cce3b23b9af7ad2"
+			"ImportPath": "github.com/hpcloud/tail",
+			"Comment": "v1.0.0",
+			"Rev": "a30252cb686a21eb2d0b98132633053ec2f7f1e5"
+		},
+		{
+			"ImportPath": "github.com/hpcloud/tail/ratelimiter",
+			"Comment": "v1.0.0",
+			"Rev": "a30252cb686a21eb2d0b98132633053ec2f7f1e5"
+		},
+		{
+			"ImportPath": "github.com/hpcloud/tail/util",
+			"Comment": "v1.0.0",
+			"Rev": "a30252cb686a21eb2d0b98132633053ec2f7f1e5"
+		},
+		{
+			"ImportPath": "github.com/hpcloud/tail/watch",
+			"Comment": "v1.0.0",
+			"Rev": "a30252cb686a21eb2d0b98132633053ec2f7f1e5"
+		},
+		{
+			"ImportPath": "github.com/hpcloud/tail/winfile",
+			"Comment": "v1.0.0",
+			"Rev": "a30252cb686a21eb2d0b98132633053ec2f7f1e5"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-isatty",
+			"Rev": "66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8"
 		},
 		{
 			"ImportPath": "github.com/rsms/gotalk",
-			"Rev": "8424c387046410d50ce7bb3d3125fa89fadf7ac8"
+			"Rev": "905f49b1ded4217be85c8cdec5d95b65b50b87d2"
 		},
 		{
 			"ImportPath": "github.com/rsms/gotalk/js",
-			"Rev": "8424c387046410d50ce7bb3d3125fa89fadf7ac8"
+			"Rev": "905f49b1ded4217be85c8cdec5d95b65b50b87d2"
 		},
 		{
 			"ImportPath": "golang.org/x/net/websocket",
-			"Rev": "b6fdb7d8a4ccefede406f8fe0f017fb58265054c"
+			"Rev": "c46f265c325130a7a6c7b27db8c6fe14b64f1a68"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/unix",
+			"Rev": "8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9"
 		},
 		{
 			"ImportPath": "gopkg.in/alecthomas/kingpin.v1",
-			"Comment": "v1.3.6",
-			"Rev": "55a69a226d28a43b913720f5d765706d49c8fa9e"
+			"Comment": "v1.3.7",
+			"Rev": "45f9714aa86a9624491adeaab1e9df1baf84dd38"
+		},
+		{
+			"ImportPath": "gopkg.in/fsnotify.v1",
+			"Comment": "v1.3.1",
+			"Rev": "a8a77c9133d2d6fd8334f3260d06f60e8d80a5fb"
 		},
 		{
 			"ImportPath": "gopkg.in/tomb.v1",
