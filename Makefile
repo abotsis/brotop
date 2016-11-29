@@ -10,8 +10,8 @@ CWD=$(shell pwd)
 NAME="brotop"
 DESCRIPTION="Top for bro log files."
 
-CCOS=windows freebsd darwin linux
-CCARCH=386 amd64
+CCOS=linux
+CCARCH=386 amd64 arm
 CCOUTPUT="pkg/{{.OS}}-{{.Arch}}/$(NAME)"
 
 NO_COLOR=\033[0m
