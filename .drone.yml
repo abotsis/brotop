@@ -11,8 +11,7 @@ build:
     environment:
       - GO15VENDOREXPERIMENT=1
     commands:
-      - echo $GOPATH
-      - export PATH=$GOPATH/bin:$PATH
+      - go get github.com/tools/godep
       - go get github.com/jteeuwen/go-bindata/...
       - go get github.com/mitchellh/gox
       - make
