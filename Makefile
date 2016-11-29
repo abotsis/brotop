@@ -59,15 +59,13 @@ goxBuild:
 
 gox: 
 	@$(ECHO) "$(OK_COLOR)==> Cross Compiling $(NAME)$(NO_COLOR)"
-	# Super hack because godep sucks
-	@mkdir -p Godeps/_workspace/src/github.com/criticalstack/brotop
-	@cp -R *.go web Godeps/_workspace/src/github.com/criticalstack/brotop
-	@GOPATH=$(shell godep path) gox -os="$(CCOS)" -arch="$(CCARCH)" -output=$(CCOUTPUT)
-	@rm -rf Godeps/_workspace/src/github.com/criticalstack/brotop
+	# @mkdir -p Godeps/_workspace/src/github.com/criticalstack/brotop
+	# @cp -R *.go web Godeps/_workspace/src/github.com/criticalstack/brotop
+	@gox -os="$(CCOS)" -arch="$(CCARCH)" -output=$(CCOUTPUT)
+	# @rm -rf Godeps/_workspace/src/github.com/criticalstack/brotop
 
 release: clean all gox
 	@mkdir -p release/
-	@echo $(VERSION) > .Version
 	@for os in $(CCOS); do \
 		for arch in $(CCARCH); do \
 			cd pkg/$$os-$$arch/; \
