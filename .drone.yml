@@ -11,6 +11,8 @@ build:
     environment:
       - GO15VENDOREXPERIMENT=1
     commands:
+      - go get github.com/jteeuwen/go-bindata/...
+      - go get github.com/mitchellh/gox
       - make
     when:
       event: [push]
