@@ -11,6 +11,7 @@ build:
     environment:
       - GO15VENDOREXPERIMENT=1
     commands:
+      - echo $GOPATH
       - go get github.com/jteeuwen/go-bindata/...
       - go get github.com/mitchellh/gox
       - make
@@ -23,7 +24,6 @@ build:
     commands:
       - apt-get update > /dev/null 2>&1
       - apt-get --yes --force-yes install rpm ruby-dev gcc make > /dev/null 2>&1
-      - echo $GOPATH
       - go get github.com/jteeuwen/go-bindata/...
       - go get github.com/mitchellh/gox
       - gem install fpm --no-rdoc --no-ri
