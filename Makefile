@@ -27,12 +27,12 @@ else
 	ECHO=/bin/echo -e
 endif
 
-all:
+all: deps
 	@mkdir -p bin/
 	@$(ECHO) "$(OK_COLOR)==> Building $(NAME) $(NO_COLOR)"
 	@godep go build -o bin/$(NAME)
 	@chmod +x bin/$(NAME)
-	@./bin/$(NAME) --version 2> VERSION
+	@./bin/$(NAME) --version >> VERSION
 	@$(ECHO) "$(OK_COLOR)==> Done$(NO_COLOR)"
 
 
