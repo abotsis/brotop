@@ -1,29 +1,66 @@
-image: mephux/docker-golang
 git:
   path: github.com/criticalstack/brotop
-  branches:
-    - master
-script:
-  - make test
-notify:
-  email:
-    recipients:
-      - $$EMAIL
-  slack:
-    username: $$USERNAME
-    webhook_url: $$WEBHOOK
-    channel: $$CHANNEL
-    on_started: true
-    on_success: true
-    on_failure: true
-publish:
-  github:
-    branch: master
-    script:
+  branch: master
+
+clone:
+  depth: 32767
+
+build:
+  normal:
+    image: golang:1.7.1-wheezy
+    environment:
+      - GO15VENDOREXPERIMENT=1
+    commands:
+      - make
+    when:
+      event: [push]
+  dist:
+    image: golang:1.7.1-wheezy
+    environment:
+      - GO15VENDOREXPERIMENT=1
+    commands:
+      - apt-get update > /dev/null 2>&1
+      - apt-get --yes --force-yes install rpm ruby-dev gcc make > /dev/null 2>&1
+      - go get github.com/mitchellh/gox
+      - gem install fpm --no-rdoc --no-ri
       - make release
-    artifacts:
-      - release
-    tag: v$(cat .Version)
-    token: $$github_token
-    user: criticalstack
-    repo: brotop
+    when:
+      event: [tag]
+publish:
+  github_release:
+    api_key: $$GITHUB
+    files: release/*
+    file_exists: fail
+    # draft: true
+    when:
+      event: tag
+
+# image: mephux/docker-golang
+# git:
+  # path: github.com/criticalstack/brotop
+  # branches:
+    # - master
+# script:
+  # - make test
+# notify:
+  # email:
+    # recipients:
+      # - $$EMAIL
+  # slack:
+    # username: $$USERNAME
+    # webhook_url: $$WEBHOOK
+    # channel: $$CHANNEL
+    # on_started: true
+    # on_success: true
+    # on_failure: true
+# publish:
+  # github:
+    # branch: master
+    # script:
+      # - make release
+    # artifacts:
+      # - release
+    # tag: v$(cat .Version)
+    # token: $$github_token
+    # user: criticalstack
+    # repo: brotop

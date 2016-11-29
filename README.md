@@ -1,6 +1,6 @@
 ## brotop - Top for bro logs.
 
-[![Build Status](http://104.236.125.70/api/badge/github.com/criticalstack/brotop/status.svg?branch=master)](http://104.236.125.70/github.com/criticalstack/brotop)
+[![Build Status](http://komanda.io:8080/api/badges/criticalstack/brotop/status.svg)](http://komanda.io:8080/criticalstack/brotop)
 
 <img height="300px" width="" src="https://raw.githubusercontent.com/criticalstack/brotop/3609c191858fcec02b68c7c4b0b85d4692af866c/brotop.png">
 
@@ -14,17 +14,7 @@ debugging and a real-time glimpse into whats being processed.
 
 # Download
 
-  * Linux
-    * [brotop linux/amd64](https://github.com/criticalstack/brotop/releases/download/v0.3.0/brotop-linux-amd64.tar.gz)
-    * [brotop linux/386](https://github.com/criticalstack/brotop/releases/download/v0.3.0/brotop-linux-386.tar.gz)
-
-  * Macosx
-    * [brotop darwin/amd64](https://github.com/criticalstack/brotop/releases/download/v0.3.0/brotop-darwin-amd64.tar.gz)
-    * [brotop darwin/386](https://github.com/criticalstack/brotop/releases/download/v0.3.0/brotop-darwin-386.tar.gz)
-
-  * Freebsd
-    * [brotop freebsd/amd64](https://github.com/criticalstack/brotop/releases/download/v0.3.0/brotop-freebsd-amd64.tar.gz)
-    * [brotop freebsd/386](https://github.com/criticalstack/brotop/releases/download/v0.3.0/brotop-freebsd-386.tar.gz)
+    * [Releases](https://github.com/criticalstack/brotop/releases)
 
 # Usage
 
