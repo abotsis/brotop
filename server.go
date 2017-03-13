@@ -62,9 +62,10 @@ func StartServer() {
 	http.Handle("/",
 		http.FileServer(
 			&assetfs.AssetFS{
-				Asset:    Asset,
-				AssetDir: AssetDir,
-				Prefix:   "web",
+				Asset:     Asset,
+				AssetDir:  AssetDir,
+				AssetInfo: AssetInfo,
+				Prefix:    "web",
 			},
 		),
 	)
