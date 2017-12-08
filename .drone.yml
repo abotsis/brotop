@@ -7,9 +7,7 @@ clone:
 
 build:
   normal:
-    image: golang:1.7.1-wheezy
-    environment:
-      - GO15VENDOREXPERIMENT=1
+    image: golang:1.9.2-stretch
     commands:
       - go get github.com/tools/godep
       - go get github.com/jteeuwen/go-bindata/...
@@ -18,16 +16,11 @@ build:
     when:
       event: [push]
   dist:
-    image: golang:1.7.1-wheezy
-    environment:
-      - GO15VENDOREXPERIMENT=1
+    image: golang:1.9.2-stretch
     commands:
-      - apt-get update > /dev/null 2>&1
-      - apt-get --yes --force-yes install rpm ruby-dev gcc make > /dev/null 2>&1
       - go get github.com/tools/godep
       - go get github.com/jteeuwen/go-bindata/...
       - go get github.com/mitchellh/gox
-      # - gem install fpm --no-rdoc --no-ri
       - make release
     when:
       event: [tag]
