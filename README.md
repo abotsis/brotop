@@ -9,7 +9,6 @@ debugging and a real-time glimpse into whats being processed.
 
 # Features
 
-  - 100% dep free binary
   - Auto-detect log locations. If BroTop can't find them use the --path switch.
 
 # Download
