@@ -87,15 +87,11 @@ func StartServer() {
 		w.Write(js)
 	})
 
-	var port string = ":8080"
+	var listen string = fmt.Sprintf("%s:%s", *ServerAddr, *ServerPort)
+	
+	log.Infof("Server listening - http://%s", listen)
 
-	if len(*ServerPort) > 0 {
-		port = fmt.Sprintf(":%s", ServerPort)
-	}
-
-	log.Infof("Server listening - http://%s%s", "127.0.0.1", port)
-
-	err := http.ListenAndServe(port, nil)
+	err := http.ListenAndServe(listen, nil)
 
 	if err != nil {
 		log.Error(err.Error())

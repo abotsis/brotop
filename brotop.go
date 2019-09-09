@@ -24,7 +24,8 @@ var (
 	Debug          = kingpin.Flag("debug", "Enable debug mode.").Bool()
 	Flush          = kingpin.Flag("flush", "Remove the BroTop cache. (~/.brotop/brotop.db)").Bool()
 	DefaultLogPath = kingpin.Flag("path", "Bro log path.").ExistingDir()
-	ServerPort     = kingpin.Flag("port", "Web server port.").Short('p').String()
+	ServerAddr     = kingpin.Flag("listen", "Web server listener address").Short('l').Default("127.0.0.1").String()
+	ServerPort     = kingpin.Flag("port", "Web server port.").Short('p').Default("8080").String()
 	Quiet          = kingpin.Flag("quiet", "Remove all output logging.").Short('q').Bool()
 
 	OutputChan = make(chan Message)
